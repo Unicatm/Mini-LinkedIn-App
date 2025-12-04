@@ -78,6 +78,7 @@ exports.login = async (req, res) => {
       uid: userDoc.id,
       role: userData.role,
       email: userData.email,
+      profile: { fullName: userData.profile.fullName },
     };
 
     const token = jwt.sign(payload, jwtSecret, jwtOptions);
@@ -88,7 +89,7 @@ exports.login = async (req, res) => {
         uid: userDoc.id,
         email: userData.email,
         role: userData.role,
-        name: userData.name,
+        profile: { fullName: userData.profile.fullName },
       },
     });
   } catch (error) {
