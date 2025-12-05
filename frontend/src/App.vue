@@ -1,13 +1,23 @@
 <template>
   <v-app>
-    <v-main>
-      <HelloWorld />
-    </v-main>
+    
+    <NavBar v-if="showNavBar" />
 
-    <AppFooter />
+    <v-main>
+      <router-view />
+    </v-main>
+    
   </v-app>
 </template>
 
 <script setup>
-  //
+import { computed } from 'vue';
+import { useRoute } from 'vue-router'; 
+import NavBar from "./components/NavBar.vue";
+
+const route = useRoute(); 
+const showNavBar = computed(() => {
+  return route.name !== 'Login' && route.name !== 'Register';
+});
+
 </script>
