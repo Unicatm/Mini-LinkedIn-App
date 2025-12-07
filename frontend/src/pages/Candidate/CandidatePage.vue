@@ -1,39 +1,45 @@
 <template>
-  <v-container>
-    <v-card class="pa-6 mt-5" elevation="4">
-      <v-card-title class="text-h4 primary--text">
-        Candidate Page
-      </v-card-title>
-      <v-divider class="my-4"></v-divider>
+  <div class="flex justify-content-center mt-5 px-3">
+    <Card class="w-full sm:w-8 md:w-6 lg:w-4 p-4 shadow-2 border-round-xl">
+      <template #title>
+        <h2 class="text-center text-xl font-semibold text-primary">Candidate Page</h2>
+      </template>
 
-      <div v-if="authStore.isAuthenticated">
-        <p class="text-h6 mb-2">
-          Hi, {{ authStore.user.profile?.fullName || "Candidat" }}!
-        </p>
-        <v-list dense>
-          <v-list-item>
-            <v-list-item-title>Email:</v-list-item-title>
-            <v-list-item-subtitle class="font-weight-bold">{{
-              authStore.user.email
-            }}</v-list-item-subtitle>
-          </v-list-item>
+      <template #content>
+        <Divider class="my-3" />
 
-          <v-list-item>
-            <v-list-item-title>Role:</v-list-item-title>
-            <v-list-item-subtitle class="font-weight-bold text-uppercase">{{
-              authStore.user.role
-            }}</v-list-item-subtitle>
-          </v-list-item>
-        </v-list>
-        <v-btn color="error" @click="authStore.logout" class="mt-4">
-          LogOut
-        </v-btn>
-      </div>
-    </v-card>
-  </v-container>
+        <div v-if="authStore.isAuthenticated">
+          <p class="text-lg font-medium mb-3">
+            Hi, {{ authStore.user.profile?.fullName || "Candidat" }}!
+          </p>
+
+          <ul class="list-none p-0 m-0">
+            <li class="flex justify-content-between py-2 border-bottom-1 surface-border">
+              <span class="font-medium">Email:</span>
+              <span class="font-semibold">{{ authStore.user.email }}</span>
+            </li>
+
+            <li class="flex justify-content-between py-2 border-bottom-1 surface-border">
+              <span class="font-medium">Role:</span>
+              <span class="font-semibold text-primary text-uppercase">
+                {{ authStore.user.role }}
+              </span>
+            </li>
+          </ul>
+
+          <Button label="Log Out" severity="danger" class="w-full mt-4" @click="authStore.logout" />
+        </div>
+      </template>
+    </Card>
+  </div>
 </template>
 
 <script setup>
 import { useAuthStore } from "@/stores/authStore";
+
+import Card from "primevue/card";
+import Divider from "primevue/divider";
+import Button from "primevue/button";
+
 const authStore = useAuthStore();
 </script>

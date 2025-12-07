@@ -1,74 +1,77 @@
 <template>
-  <v-app-bar app color="primary" dark>
-    <v-app-bar-title>
-      <router-link
-        to="/"
-        style="color: inherit; text-decoration: none"
-        class="font-weight-bold"
-      >
+  <Menubar :model="items">
+    <template #start>
+      <router-link to="/" class="text-2xl font-bold text-blue-600 no-underline">
         Mini LinkedIn
       </router-link>
-    </v-app-bar-title>
-
-    <v-spacer></v-spacer>
-
-    <template v-if="authStore.isAuthenticated">
-      <v-btn
-        v-if="authStore.isRecruiter"
-        :to="{ name: 'RecruiterPage' }"
-        variant="text"
-      >
-        Dashboard
-      </v-btn>
-      <v-btn
-        v-if="authStore.isCandidate"
-        :to="{ name: 'CandidatePage' }"
-        variant="text"
-      >
-        Applications
-      </v-btn>
-
-      <v-btn
-        v-if="authStore.isCandidate"
-        :to="{ name: 'CandidateProfile' }"
-        variant="text"
-        prepend-icon="mdi-account-circle"
-        class="mx-1"
-      >
-        Profile
-      </v-btn>
-      <v-btn
-        v-else-if="authStore.isRecruiter"
-        :to="{ name: 'RecruiterProfile' }"
-        variant="text"
-        prepend-icon="mdi-account-circle"
-        class="mx-1"
-      >
-        Profile
-      </v-btn>
-
-      <v-btn @click="authStore.logout" color="error" class="ml-3" icon>
-        <v-icon>mdi-logout</v-icon>
-        <v-tooltip activator="parent" location="bottom">Log Out</v-tooltip>
-      </v-btn>
     </template>
-
-    <template v-else>
-      <v-btn :to="{ name: 'Login' }" variant="text"> Login </v-btn>
-      <v-btn
-        :to="{ name: 'Register' }"
-        variant="flat"
-        color="secondary"
-        class="ml-2"
+    <template #item="{ item, props, hasSubmenu, root }">
+      <a
+        @click="item.click"
+        v-if="item.condition"
+        v-ripple
+        class="flex items-center"
+        v-bind="props.action"
       >
-        SignUp
-      </v-btn>
+        <span>{{ item.label }}</span>
+        <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge" />
+        <span
+          v-if="item.shortcut"
+          class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
+          >{{ item.shortcut }}</span
+        >
+        <i
+          v-if="hasSubmenu"
+          :class="['pi pi-angle-down ml-auto', { 'pi-angle-down': root, 'pi-angle-right': !root }]"
+        ></i>
+      </a>
     </template>
-  </v-app-bar>
+    <template #end>
+      <div class="flex items-center justify-center gap-3">
+        <Avatar shape="circle" icon="pi pi-user" class="bg-blue-100" />
+        <Button
+          label="Logout"
+          rounded
+          variant="outlined"
+          class="border-blue-600 text-blue-600 hover:bg-blue-50"
+          size="small"
+          @click="() => authStore.logout()"
+        />
+      </div>
+    </template>
+  </Menubar>
 </template>
 
 <script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { Avatar, Menubar, Badge, Button } from "primevue";
 import { useAuthStore } from "@/stores/authStore";
 
+const router = useRouter();
 const authStore = useAuthStore();
+
+const items = ref([
+  {
+    label: "Jobs",
+    icon: "pi pi-home",
+    click: () => router.push({ name: "RecruiterPage" }),
+    condition: true,
+  },
+  {
+    label: "Profile",
+    icon: "pi pi-home",
+    click: () =>
+      router.push({
+        name: authStore.isRecruiter ? "RecruiterProfile" : "CandidateProfile",
+      }),
+    condition: true,
+  },
+  {
+    label: "Applications",
+    icon: "pi pi-search",
+    click: () => router.push({ name: "CandidatePage" }),
+    condition: authStore.isCandidate,
+  },
+]);
 </script>

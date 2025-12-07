@@ -1,31 +1,30 @@
-/**
- * main.js
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
+import "primeicons/primeicons.css";
+import "primeflex/primeflex.css";
 
-// Plugins
-import { registerPlugins } from "@/plugins";
-
-// Components
-import App from "./App.vue";
-import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
-
-// Composables
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import PrimeVue from "primevue/config";
+import Lara from "@primeuix/themes/lara";
+import ConfirmationService from "primevue/confirmationservice";
+import ToastService from "primevue/toastservice";
 
-// Styles
-import "unfonts.css";
+import App from "./App.vue";
+import router from "./router";
 
 const app = createApp(App);
-const vuetify = createVuetify({ components, directives });
-const pinia = createPinia();
+app.use(PrimeVue, {
+  theme: {
+    preset: Lara,
+    options: {
+      prefix: "p",
+      darkModeSelector: "none",
+    },
+  },
+});
 
-registerPlugins(app);
-app.use(pinia);
-app.use(vuetify);
+app.use(createPinia());
+app.use(router);
+app.use(ConfirmationService);
+app.use(ToastService);
 
 app.mount("#app");

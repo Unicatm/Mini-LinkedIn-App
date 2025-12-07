@@ -20,4 +20,8 @@ export const jobsApi = {
     const response = await api.post("/jobs", jobData);
     return response.data;
   },
+
+  async deleteJob(jobId) {
+    return api.delete(`/jobs/${jobId}`);
+  },
 };

@@ -49,21 +49,39 @@ exports.getAllJobs = async (req, res) => {
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;
-    const jobRef = db.collection("jobs").doc(id);
-    const doc = await jobRef.get();
+    const userId = req.user.uid;
 
-    if (!doc.exists) {
+    const jobRef = db.collection("jobs").doc(id);
+    const jobDoc = await jobRef.get();
+
+    if (!jobDoc.exists) {
       return res.status(404).json({ message: "The job does not exist." });
     }
 
-    if (doc.data().recruiterId !== req.user.uid) {
+    if (jobDoc.data().recruiterId !== userId) {
       return res
         .status(403)
         .json({ message: "You do not have the permision to delete this job." });
     }
 
-    await jobRef.delete();
-    res.status(200).json({ message: "Job was deleted." });
+    const batch = db.batch();
+
+    batch.delete(jobRef);
+
+    const applicationsSnapshot = await db
+      .collection("applications")
+      .where("jobId", "==", id)
+      .get();
+
+    applicationsSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    res
+      .status(200)
+      .json({ message: "The job and related applications have been deleted." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

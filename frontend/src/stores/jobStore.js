@@ -8,9 +8,7 @@ export const useJobStore = defineStore("job", () => {
   const isLoading = ref(false);
   const error = ref(null);
 
-  const activeJobs = computed(() =>
-    jobs.value.filter((job) => job.status === "active")
-  );
+  const activeJobs = computed(() => jobs.value.filter((job) => job.status === "active"));
 
   async function fetchJobs() {
     isLoading.value = true;
@@ -18,6 +16,7 @@ export const useJobStore = defineStore("job", () => {
     try {
       const data = await jobsApi.fetchJobs();
       jobs.value = data;
+      console.log(data);
     } catch (err) {
       error.value = "Error retrieving jobs.";
       console.error("Error at fetchJobs:", err);
@@ -56,9 +55,25 @@ export const useJobStore = defineStore("job", () => {
       const response = await jobsApi.createJob(jobData);
 
       jobs.value.unshift(response.data);
+
+      fetchJobs();
       return true;
     } catch (err) {
       error.value = err.response?.data?.message || "Error creating job.";
+      throw err;
+    }
+  }
+
+  async function removeJob(jobId) {
+    try {
+      await jobsApi.deleteJob(jobId);
+
+      jobs.value = jobs.value.filter((job) => job.id !== jobId);
+      fetchJobs();
+
+      return true;
+    } catch (err) {
+      error.value = err.response?.data?.message || "Could not delete job.";
       throw err;
     }
   }
@@ -73,5 +88,6 @@ export const useJobStore = defineStore("job", () => {
     fetchMyApplications,
     applyToJob,
     createJob,
+    removeJob,
   };
 });
