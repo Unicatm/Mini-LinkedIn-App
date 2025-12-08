@@ -46,6 +46,20 @@ exports.getAllJobs = async (req, res) => {
   }
 };
 
+exports.getMyJobs = async (req, res) => {
+  try {
+    const snapshot = await db
+      .collection("jobs")
+      .where("recruiterId", "==", req.user.uid)
+      .get();
+
+    const jobs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    res.status(200).json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;

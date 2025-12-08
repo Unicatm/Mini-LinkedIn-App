@@ -16,10 +16,25 @@ export const useJobStore = defineStore("job", () => {
     try {
       const data = await jobsApi.fetchJobs();
       jobs.value = data;
-      console.log(data);
+      // console.log(data);
     } catch (err) {
       error.value = "Error retrieving jobs.";
       console.error("Error at fetchJobs:", err);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchMyJobs() {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const data = await jobsApi.fetchMyJobs();
+      jobs.value = data;
+      // console.log(data);
+    } catch (err) {
+      error.value = "Error retrieving jobs.";
+      console.error("Error at fetchMyJobs:", err);
     } finally {
       isLoading.value = false;
     }
@@ -85,6 +100,7 @@ export const useJobStore = defineStore("job", () => {
     error,
     activeJobs,
     fetchJobs,
+    fetchMyJobs,
     fetchMyApplications,
     applyToJob,
     createJob,

@@ -55,7 +55,7 @@ const items = ref([
   {
     label: "Jobs",
     icon: "pi pi-home",
-    click: () => router.push({ name: "RecruiterPage" }),
+    click: () => router.push({ name: "JobsPage" }),
     condition: true,
   },
   {

@@ -7,6 +7,7 @@ import CandidatePage from "@/pages/Candidate/CandidatePage.vue";
 import RecruiterProfile from "@/pages/Recruiter/RecruiterProfile.vue";
 import CandidateProfile from "@/pages/Candidate/CandidateProfile.vue";
 import LoginPage from "@/pages/LoginPage.vue";
+import JobsPage from "@/pages/JobsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,7 +15,18 @@ const router = createRouter({
     { path: "/", redirect: "/login" },
     { path: "/login", name: "Login", component: LoginPage },
     { path: "/register", name: "Register", component: Register },
-
+    {
+      path: "/jobs",
+      component: JobsPage,
+      name: "JobsPage",
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/recruiter/:id",
+      name: "PublicRecruiterProfile",
+      component: () => import("@/pages/PublicRecruiterProfile.vue"),
+      meta: { requiresAuth: true },
+    },
     {
       path: "/recruiter",
       component: RecruiterProfile,

@@ -22,7 +22,7 @@
 
         <div class="flex align-items-center mb-3">
           <i class="pi pi-briefcase text-blue-600 mr-2"></i>
-          <span class="text-700 font-medium">{{ user?.profile?.companyName }}</span>
+          <span class="text-700 font-medium">{{ myProfile?.profile?.companyName }}</span>
         </div>
 
         <div class="flex align-items-center mb-3">
@@ -42,18 +42,23 @@
 
       <div v-else class="flex flex-column gap-3">
         <span class="p-float-label mt-3">
-          <Textarea v-model="formData.bio" rows="4" class="w-full" autoResize />
           <label>About you</label>
+          <Textarea v-model="formData.bio" rows="4" class="w-full" autoResize />
         </span>
         <span class="p-float-label">
-          <InputText v-model="formData.website" class="w-full" />
           <label>Website</label>
+          <InputText v-model="formData.website" class="w-full" />
         </span>
         <span class="p-float-label">
-          <InputText v-model="formData.location" class="w-full" />
           <label>Location</label>
+          <InputText v-model="formData.location" class="w-full" />
         </span>
-        <Button label="Salvează" size="small" @click="saveProfile" :loading="authStore.isLoading" />
+        <Button
+          label="Salvează"
+          size="small"
+          @click="saveProfile"
+          :loading="usersStore.isLoading"
+        />
       </div>
     </template>
   </Card>
@@ -61,19 +66,19 @@
 
 <script setup>
 import { ref, computed, reactive } from "vue";
-import { useAuthStore } from "@/stores/authStore";
+import { useUsersStore } from "@/stores/usersStore";
 import Card from "primevue/card";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 
-const authStore = useAuthStore();
-const user = computed(() => authStore.user);
+const usersStore = useUsersStore();
+const myProfile = computed(() => usersStore.myProfile);
 
 const profileData = computed(() => ({
-  bio: user.value?.profile?.bio || "",
-  website: user.value?.profile?.website || "",
-  location: user.value?.profile?.location || "",
+  bio: myProfile.value?.profile?.bio || "",
+  website: myProfile.value?.profile?.website || "",
+  location: myProfile.value?.profile?.location || "",
 }));
 
 const isEditing = ref(false);
@@ -89,7 +94,7 @@ const toggleEdit = () => {
 };
 
 const saveProfile = async () => {
-  await authStore.updateProfile(formData);
+  await usersStore.updateMyProfile(formData);
   isEditing.value = false;
 };
 </script>

@@ -61,39 +61,6 @@ export const useAuthStore = defineStore("auth", () => {
       isLoading.value = false;
     }
   }
-
-  async function fetchUserProfile() {
-    isLoading.value = true;
-    try {
-      const userData = await authApi.fetchProfile();
-
-      user.value = userData;
-
-      localStorage.setItem("user", JSON.stringify(userData));
-    } catch (err) {
-      console.error("Eroare la preluarea profilului:", err);
-      if (err.response?.status === 401) {
-        logout();
-      }
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function updateProfile(profileData) {
-    isLoading.value = true;
-    try {
-      await authApi.updateProfile(profileData);
-      user.value.profile = { ...user.value.profile, ...profileData };
-      localStorage.setItem("user", JSON.stringify(user.value));
-    } catch (err) {
-      error.value = "Could not update profile.";
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   function logout() {
     saveState(null, null);
     router.push("/login");
@@ -110,7 +77,5 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     register,
     logout,
-    fetchUserProfile,
-    updateProfile,
   };
 });

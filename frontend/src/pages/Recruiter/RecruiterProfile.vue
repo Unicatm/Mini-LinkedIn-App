@@ -71,7 +71,7 @@
 
 <script setup>
 import { onMounted } from "vue";
-import { useAuthStore } from "@/stores/authStore";
+import { useUsersStore } from "@/stores/usersStore";
 import { useJobStore } from "@/stores/jobStore";
 
 import JobCreateForm from "@/components/recruiter/JobCreateForm.vue";
@@ -87,14 +87,14 @@ import Card from "primevue/card";
 import Button from "primevue/button";
 import Tag from "primevue/tag";
 
-const authStore = useAuthStore();
+const usersStore = useUsersStore();
 const jobStore = useJobStore();
 const confirm = useConfirm();
 const toast = useToast();
 
 onMounted(async () => {
-  await authStore.fetchUserProfile();
-  await jobStore.fetchJobs();
+  await usersStore.fetchMyProfile();
+  await jobStore.fetchMyJobs();
 });
 
 const confirmDelete = (event, jobId) => {
