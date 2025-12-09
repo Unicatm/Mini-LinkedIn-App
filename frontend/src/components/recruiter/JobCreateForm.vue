@@ -1,10 +1,28 @@
 <template>
-  <Card class="shadow-1 border-round-xl mb-4">
+  <Card v-if="!readOnly" class="shadow-1 border-round-xl mb-4">
     <template #content>
-      <div class="flex flex-column gap-3">
+      <div
+        v-if="!isProfileComplete"
+        class="bg-yellow-50 border-1 border-yellow-200 border-round p-3 mb-3 flex align-items-start gap-3"
+      >
+        <i class="pi pi-exclamation-triangle text-yellow-600 text-xl mt-1"></i>
+        <div>
+          <div class="font-medium text-yellow-700 mb-1">Complete your profile!</div>
+          <p class="m-0 text-sm text-yellow-700 line-height-3">
+            To post a job, you must complete the
+            <strong>Introduction</strong> section (Bio, Company & Location).
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-column gap-3"
+        :class="{ 'opacity-50 pointer-events-none': !isProfileComplete }"
+      >
         <span class="text-500 font-medium ml-1">Publish a new Job</span>
 
         <InputText v-model="title" placeholder="Job Title (ex: Senior Java Dev)" class="w-full" />
+
         <Textarea
           v-model="description"
           rows="2"
@@ -29,6 +47,7 @@
             icon="pi pi-send"
             @click="handlePostJob"
             :loading="loading"
+            :disabled="!isProfileComplete"
             variant="outlined"
             class="border-blue-600 text-blue-600 hover:bg-blue-50"
           />
@@ -39,22 +58,47 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useJobStore } from "@/stores/jobStore";
+import { useUsersStore } from "@/stores/usersStore"; // Importăm userStore
 import Card from "primevue/card";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Dropdown from "primevue/dropdown";
 
+const props = defineProps({
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const jobStore = useJobStore();
+const usersStore = useUsersStore();
+
 const title = ref("");
 const description = ref("");
 const salary = ref("");
 const type = ref("Remote");
 const loading = ref(false);
 
+const isProfileComplete = computed(() => {
+  const profile = usersStore.myProfile?.profile;
+
+  return (
+    profile &&
+    profile.companyName &&
+    profile.companyName.trim() !== "" &&
+    profile.location &&
+    profile.location.trim() !== "" &&
+    profile.bio &&
+    profile.bio.trim() !== ""
+  );
+});
+
 const handlePostJob = async () => {
+  if (!isProfileComplete.value) return;
   if (!title.value || !description.value) return;
 
   loading.value = true;

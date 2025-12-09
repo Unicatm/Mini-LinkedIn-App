@@ -8,21 +8,31 @@
         shape="circle"
         class="profile-avatar shadow-4 w-8rem h-8rem border-4 -mt-5"
       />
-      <h1 class="text-900 font-bold mb-1 mt-3">{{ user?.profile?.fullName || "Anonim" }}</h1>
-      <span class="text-500 font-medium"
-        >Recruiter at {{ user?.profile?.companyName || "Company" }}</span
-      >
+      <h1 class="text-900 font-bold mb-1 mt-3">{{ fullName || "Anonim" }}</h1>
+      <span class="text-500 font-medium">Recruiter at {{ companyName || "Company" }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useAuthStore } from "@/stores/authStore";
 import Avatar from "primevue/avatar";
 
-const authStore = useAuthStore();
-const user = computed(() => authStore.user);
+const props = defineProps({
+  fullName: {
+    type: String,
+    default: "",
+  },
+  companyName: {
+    type: String,
+    default: "",
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+console.log(props.user);
 </script>
 
 <style scoped>

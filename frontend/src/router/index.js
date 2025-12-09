@@ -24,7 +24,7 @@ const router = createRouter({
     {
       path: "/recruiter/:id",
       name: "PublicRecruiterProfile",
-      component: () => import("@/pages/PublicRecruiterProfile.vue"),
+      component: RecruiterProfile,
       meta: { requiresAuth: true },
     },
     {

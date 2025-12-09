@@ -1,9 +1,9 @@
 <template>
   <Menubar :model="items">
     <template #start>
-      <router-link to="/" class="text-2xl font-bold text-blue-600 no-underline">
+      <span class="text-2xl font-bold text-blue-600 no-underline cursor-pointer" @click="goToHome">
         Mini LinkedIn
-      </router-link>
+      </span>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
       <a
@@ -28,7 +28,12 @@
     </template>
     <template #end>
       <div class="flex items-center justify-center gap-3">
-        <Avatar shape="circle" icon="pi pi-user" class="bg-blue-100" />
+        <Avatar
+          shape="circle"
+          icon="pi pi-user"
+          class="bg-blue-100 cursor-pointer"
+          @click="goToHome"
+        />
         <Button
           label="Logout"
           rounded
@@ -74,4 +79,10 @@ const items = ref([
     condition: authStore.isCandidate,
   },
 ]);
+
+const goToHome = () => {
+  router.push({
+    name: authStore.isRecruiter ? "RecruiterProfile" : "CandidateProfile",
+  });
+};
 </script>

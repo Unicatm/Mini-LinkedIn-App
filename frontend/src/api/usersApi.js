@@ -6,8 +6,9 @@ export const usersApi = {
     return response.data;
   },
 
-  async fetchPublicProfile() {
-    const response = await api.get("/users/:id/public");
+  async fetchPublicProfile(userId) {
+    const response = await api.get(`/users/${userId}/public`);
+    // console.log(response.data);
     return response.data;
   },
 

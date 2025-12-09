@@ -4,6 +4,7 @@
       <div class="flex justify-content-between align-items-center">
         <span>Introduction</span>
         <Button
+          v-if="!readOnly"
           :icon="isEditing ? 'pi pi-check' : 'pi pi-pencil'"
           text
           rounded
@@ -15,35 +16,54 @@
 
     <template #content>
       <div v-if="!isEditing">
-        <p v-if="profileData.bio" class="text-500 line-height-3 mb-4">
-          {{ profileData.bio }}
-        </p>
-        <p v-else class="text-500 font-italic mb-4">You haven't added a description yet.</p>
+        <div>
+          <p v-if="profileData.bio" class="text-500 line-height-3 mb-4">
+            {{ profileData.bio }}
+          </p>
+          <p v-else class="text-500 font-italic mb-4">
+            {{ readOnly ? "No description provided." : "You haven't added a description yet." }}
+          </p>
+        </div>
 
         <div class="flex align-items-center mb-3">
           <i class="pi pi-briefcase text-blue-600 mr-2"></i>
-          <span class="text-700 font-medium">{{ myProfile?.profile?.companyName }}</span>
+          <span v-if="profileData.companyName" class="text-700 font-medium">
+            {{ profileData.companyName }}
+          </span>
+          <span v-else class="text-400 text-sm">
+            {{ readOnly ? "No company" : "Add company" }}
+          </span>
         </div>
 
         <div class="flex align-items-center mb-3">
           <i class="pi pi-globe text-blue-600 mr-2"></i>
-          <span v-if="profileData.website" class="text-700 text-sm">{{ profileData.website }}</span>
-          <span v-else class="text-400 text-sm">Add website</span>
+          <span v-if="profileData.website" class="text-700 text-sm">
+            {{ profileData.website }}
+          </span>
+          <span v-else class="text-400 text-sm">
+            {{ readOnly ? "No website" : "Add website" }}
+          </span>
         </div>
 
         <div class="flex align-items-center">
           <i class="pi pi-map-marker text-blue-600 mr-2"></i>
-          <span v-if="profileData.location" class="text-700 text-sm">{{
-            profileData.location
-          }}</span>
-          <span v-else class="text-400 text-sm">Add location</span>
+          <span v-if="profileData.location" class="text-700 text-sm">
+            {{ profileData.location }}
+          </span>
+          <span v-else class="text-400 text-sm">
+            {{ readOnly ? "No location" : "Add location" }}
+          </span>
         </div>
       </div>
 
-      <div v-else class="flex flex-column gap-3">
-        <span class="p-float-label mt-3">
+      <div v-else class="flex flex-column gap-2">
+        <span class="p-float-label">
           <label>About you</label>
           <Textarea v-model="formData.bio" rows="4" class="w-full" autoResize />
+        </span>
+        <span class="p-float-label">
+          <label>Company</label>
+          <InputText v-model="formData.companyName" class="w-full" />
         </span>
         <span class="p-float-label">
           <label>Website</label>
@@ -53,12 +73,16 @@
           <label>Location</label>
           <InputText v-model="formData.location" class="w-full" />
         </span>
-        <Button
-          label="Salvează"
-          size="small"
-          @click="saveProfile"
-          :loading="usersStore.isLoading"
-        />
+        <div class="flex gap-2 justify-content-end">
+          <Button
+            label="Cancel"
+            text
+            size="small"
+            severity="secondary"
+            @click="isEditing = false"
+          />
+          <Button label="Save" size="small" @click="saveProfile" :loading="usersStore.isLoading" />
+        </div>
       </div>
     </template>
   </Card>
@@ -72,21 +96,48 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 
-const usersStore = useUsersStore();
-const myProfile = computed(() => usersStore.myProfile);
+const props = defineProps({
+  profileData: {
+    type: Object,
+    default: () => ({}),
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-const profileData = computed(() => ({
-  bio: myProfile.value?.profile?.bio || "",
-  website: myProfile.value?.profile?.website || "",
-  location: myProfile.value?.profile?.location || "",
-}));
+const usersStore = useUsersStore();
+
+const profileData = computed(() => {
+  if (props.readOnly) {
+    const data = props.profileData || {};
+    return {
+      bio: data.bio || "",
+      companyName: data.companyName || "",
+      website: data.website || "",
+      location: data.location || "",
+    };
+  }
+
+  const storeProfile = usersStore.myProfile?.profile || {};
+  return {
+    bio: storeProfile.bio || "",
+    companyName: storeProfile.companyName || "",
+    website: storeProfile.website || "",
+    location: storeProfile.location || "",
+  };
+});
 
 const isEditing = ref(false);
-const formData = reactive({ bio: "", website: "", location: "" });
+const formData = reactive({ bio: "", website: "", location: "", companyName: "" });
 
 const toggleEdit = () => {
+  if (props.readOnly) return;
+
   if (!isEditing.value) {
     formData.bio = profileData.value.bio;
+    formData.companyName = profileData.value.companyName;
     formData.website = profileData.value.website;
     formData.location = profileData.value.location;
   }
@@ -94,7 +145,7 @@ const toggleEdit = () => {
 };
 
 const saveProfile = async () => {
-  await usersStore.updateMyProfile(formData);
+  await usersStore.updateMyProfile({ ...formData });
   isEditing.value = false;
 };
 </script>

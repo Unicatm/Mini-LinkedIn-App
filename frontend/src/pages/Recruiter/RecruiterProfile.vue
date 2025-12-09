@@ -3,66 +3,38 @@
     <Toast />
     <ConfirmPopup />
 
-    <RecruiterHeader />
+    <RecruiterHeader
+      :readOnly="isReadOnly"
+      :fullName="currentProfile?.profile?.fullName"
+      :companyName="currentProfile?.profile?.companyName"
+    />
 
     <div class="grid w-full max-w-7xl mx-auto px-4 mt-6">
       <div class="col-12 md:col-4 lg:col-3">
-        <RecruiterBio />
+        <RecruiterBio :readOnly="isReadOnly" :profileData="currentProfile?.profile" />
       </div>
 
       <div class="col-12 md:col-8 lg:col-9">
-        <JobCreateForm />
+        <JobCreateForm :readOnly="isReadOnly" />
 
         <div v-if="jobStore.isLoading" class="flex justify-content-center mt-4">
           <i class="pi pi-spin pi-spinner text-2xl text-primary"></i>
         </div>
 
-        <div v-else-if="jobStore.activeJobs.length === 0" class="text-center text-500 mt-5">
+        <div v-else-if="currentJobs.length === 0" class="text-center text-500 mt-5">
           You have not posted any active jobs at the moment.
         </div>
 
         <div v-else class="flex flex-column gap-4 mt-4">
-          <Card v-for="job in jobStore.activeJobs" :key="job.id" class="shadow-1 border-round-xl">
-            <template #title>
-              <div class="flex justify-content-between align-items-start">
-                <span class="text-xl font-bold">{{ job.title }}</span>
-                <Tag :value="job.type" severity="success" rounded />
-              </div>
-            </template>
-
-            <template #content>
-              <p class="m-0 text-700 line-height-3">{{ job.description }}</p>
-              <div class="mt-3 flex gap-2">
-                <Tag
-                  icon="pi pi-wallet"
-                  severity="info"
-                  :value="job.salary || 'Confidential'"
-                  rounded
-                  class="bg-blue-600"
-                />
-              </div>
-            </template>
-
-            <template #footer>
-              <div
-                class="flex justify-content-between align-items-center border-top-1 border-200 pt-3"
-              >
-                <span class="text-sm text-500">
-                  <i class="pi pi-calendar mr-1"></i>
-                  Posted at {{ formatDate(job.createdAt) }}
-                </span>
-
-                <Button
-                  icon="pi pi-trash"
-                  label="Delete"
-                  severity="danger"
-                  text
-                  size="small"
-                  @click="confirmDelete($event, job.id)"
-                />
-              </div>
-            </template>
-          </Card>
+          <JobCard
+            v-for="job in currentJobs"
+            :key="job.id"
+            :job="job"
+            :isOwner="!isReadOnly"
+            :hideProfileLink="true"
+            @apply="handleApply"
+            @delete="confirmDelete($event, job.id)"
+          />
         </div>
       </div>
     </div>
@@ -70,31 +42,39 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/usersStore";
 import { useJobStore } from "@/stores/jobStore";
+import { useAuthStore } from "@/stores/authStore";
 
 import JobCreateForm from "@/components/recruiter/JobCreateForm.vue";
 import RecruiterBio from "@/components/recruiter/profile/RecruiterBio.vue";
 import RecruiterHeader from "@/components/recruiter/profile/RecruiterHeader.vue";
+import JobCard from "@/components/JobCard.vue";
 
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import ConfirmPopup from "primevue/confirmpopup";
 import Toast from "primevue/toast";
-import Card from "primevue/card";
-import Button from "primevue/button";
-import Tag from "primevue/tag";
 
+const route = useRoute();
 const usersStore = useUsersStore();
 const jobStore = useJobStore();
+const authStore = useAuthStore();
 const confirm = useConfirm();
 const toast = useToast();
 
-onMounted(async () => {
-  await usersStore.fetchMyProfile();
-  await jobStore.fetchMyJobs();
+const isLoading = ref(true);
+const error = ref(null);
+
+const isReadOnly = computed(() => {
+  if (route.params.id == undefined || route.params.id == authStore.user.uid) {
+    return false;
+  } else {
+    return true;
+  }
 });
 
 const confirmDelete = (event, jobId) => {
@@ -130,6 +110,51 @@ const confirmDelete = (event, jobId) => {
     reject: () => {},
   });
 };
+
+const currentProfile = computed(() => {
+  return isReadOnly.value ? usersStore.visitedProfile?.user : usersStore.myProfile;
+});
+
+const currentJobs = computed(() => {
+  return isReadOnly.value ? usersStore.visitedProfile?.jobs || [] : jobStore.activeJobs;
+});
+
+const loadData = async () => {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    if (isReadOnly.value) {
+      const recruiterId = route.params.id;
+      await usersStore.fetchPublicProfile(recruiterId);
+
+      if (authStore.isCandidate) {
+        await jobStore.fetchMyApplications();
+      }
+
+      // console.log(usersStore.visitedProfile);
+    } else {
+      await Promise.all([usersStore.fetchMyProfile(), jobStore.fetchMyJobs()]);
+      // console.log(usersStore.myProfile);
+    }
+  } catch (e) {
+    console.error(e);
+    error.value = "Failed to load profile";
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(async () => {
+  loadData();
+});
+
+watch(
+  () => route.params.id,
+  () => {
+    loadData();
+  }
+);
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "";

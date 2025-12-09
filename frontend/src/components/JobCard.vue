@@ -40,6 +40,16 @@
         </span>
 
         <Button
+          v-if="isOwner"
+          icon="pi pi-trash"
+          label="Delete"
+          severity="danger"
+          text
+          size="small"
+          @click="confirmDelete($event, job.id)"
+        />
+
+        <Button
           v-if="authStore.isCandidate"
           label="Apply"
           icon="pi pi-send"
@@ -49,7 +59,7 @@
         />
 
         <Button
-          v-else
+          v-if="!hideProfileLink && !isMyJob"
           label="View Recruiter's profile"
           size="small"
           variant="text"
@@ -69,8 +79,13 @@ import Card from "primevue/card";
 import Tag from "primevue/tag";
 import Button from "primevue/button";
 
-const props = defineProps(["job"]);
-const emit = defineEmits(["apply"]);
+const props = defineProps({
+  job: Object,
+  isApplied: Boolean,
+  isOwner: { type: Boolean, default: false },
+  hideProfileLink: { type: Boolean, default: false },
+});
+const emit = defineEmits(["apply", "delete"]);
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -81,10 +96,10 @@ const goToRecruiterProfile = () => {
       name: "PublicRecruiterProfile",
       params: { id: props.job.recruiterId },
     });
-  } else {
-    console.warn("Recruiter ID missing form job object");
   }
 };
+
+const isMyJob = props.job.recruiterId == authStore.user.uid;
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "";
