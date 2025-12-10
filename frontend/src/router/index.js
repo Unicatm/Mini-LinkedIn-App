@@ -6,6 +6,7 @@ import RecruiterProfile from "@/pages/Recruiter/RecruiterProfile.vue";
 import CandidateProfile from "@/pages/Candidate/CandidateProfile.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import JobsPage from "@/pages/JobsPage.vue";
+import JobApplicationsPage from "@/pages/JobApplicationsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,7 +44,12 @@ const router = createRouter({
       component: CandidateProfile,
       meta: { requiresAuth: true },
     },
-
+    {
+      path: "/jobs/:id/applications",
+      name: "JobApplications",
+      component: JobApplicationsPage,
+      meta: { requiresAuth: true, role: "recruiter" },
+    },
     {
       path: "/:catchAll(.*)",
       redirect: "/login",

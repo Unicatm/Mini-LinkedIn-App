@@ -51,6 +51,15 @@
           />
 
           <Button
+            v-if="isOwner"
+            label="Applications"
+            icon="pi pi-users"
+            size="small"
+            outlined
+            @click="goToApplications"
+          />
+
+          <Button
             v-if="authStore.isCandidate"
             label="Apply"
             icon="pi pi-send"
@@ -99,6 +108,13 @@ const goToRecruiterProfile = () => {
       params: { id: props.job.recruiterId },
     });
   }
+};
+
+const goToApplications = () => {
+  router.push({
+    name: "JobApplications",
+    params: { id: props.job.id },
+  });
 };
 
 const isMyJob = props.job.recruiterId == authStore.user.uid;

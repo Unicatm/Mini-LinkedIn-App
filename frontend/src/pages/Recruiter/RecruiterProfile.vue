@@ -44,6 +44,8 @@ import { useUsersStore } from "@/stores/usersStore";
 import { useJobStore } from "@/stores/jobStore";
 import { useAuthStore } from "@/stores/authStore";
 
+import { useJobActions } from "@/composables/useJobActions";
+
 import JobCreateForm from "@/components/recruiter/JobCreateForm.vue";
 import RecruiterBio from "@/components/recruiter/profile/RecruiterBio.vue";
 import RecruiterHeader from "@/components/recruiter/profile/RecruiterHeader.vue";
@@ -54,6 +56,8 @@ import { useToast } from "primevue/usetoast";
 
 import ConfirmPopup from "primevue/confirmpopup";
 import Toast from "primevue/toast";
+
+const { handleApply } = useJobActions();
 
 const route = useRoute();
 const usersStore = useUsersStore();
@@ -151,14 +155,4 @@ watch(
     loadData();
   }
 );
-
-const formatDate = (timestamp) => {
-  if (!timestamp) return "";
-  const date = timestamp._seconds ? new Date(timestamp._seconds * 1000) : new Date(timestamp);
-  return date.toLocaleDateString("ro-RO", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-};
 </script>

@@ -17,4 +17,11 @@ router.get(
   applicationsController.getApplications
 );
 
+router.get(
+  "/job/:jobId",
+  verifyToken,
+  checkRole("recruiter"),
+  applicationsController.getJobApplications
+);
+
 module.exports = router;

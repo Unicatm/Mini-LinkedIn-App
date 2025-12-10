@@ -6,6 +6,7 @@ export const useJobStore = defineStore("job", () => {
   const jobs = ref([]);
   const applications = ref([]);
   const appliedJobIds = ref(new Set());
+  const currentJobApplications = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
 
@@ -21,6 +22,21 @@ export const useJobStore = defineStore("job", () => {
     } catch (err) {
       error.value = "Error retrieving jobs.";
       console.error("Error at fetchJobs:", err);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchJobById(jobId) {
+    const existingJob = jobs.value.find((j) => j.id === jobId);
+    if (existingJob) return existingJob;
+
+    isLoading.value = true;
+    try {
+      const data = await jobsApi.getJobById(jobId);
+      return data;
+    } catch (err) {
+      error.value = "Job not found";
     } finally {
       isLoading.value = false;
     }
@@ -51,6 +67,18 @@ export const useJobStore = defineStore("job", () => {
     } catch (err) {
       error.value = "Error retrieving applications.";
       console.error("Error at fetchMyApplications:", err);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchApplicationsForJob(jobId) {
+    isLoading.value = true;
+    try {
+      const response = await jobsApi.fetchApplicationsForJob(jobId);
+      currentJobApplications.value = response;
+    } catch (err) {
+      error.value = "Could not fetch applications.";
     } finally {
       isLoading.value = false;
     }
@@ -101,12 +129,15 @@ export const useJobStore = defineStore("job", () => {
   return {
     jobs,
     applications,
+    currentJobApplications,
     isLoading,
     error,
     activeJobs,
     fetchJobs,
+    fetchJobById,
     fetchMyJobs,
     fetchMyApplications,
+    fetchApplicationsForJob,
     applyToJob,
     createJob,
     removeJob,
