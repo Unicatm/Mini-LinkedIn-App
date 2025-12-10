@@ -3,11 +3,7 @@
     <Toast />
     <ConfirmPopup />
 
-    <RecruiterHeader
-      :readOnly="isReadOnly"
-      :fullName="currentProfile?.profile?.fullName"
-      :companyName="currentProfile?.profile?.companyName"
-    />
+    <RecruiterHeader :readOnly="isReadOnly" :user="currentProfile" />
 
     <div class="grid w-full max-w-7xl mx-auto px-4 mt-6">
       <div class="col-12 md:col-4 lg:col-3">

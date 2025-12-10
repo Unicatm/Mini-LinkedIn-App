@@ -38,7 +38,14 @@
         </div>
 
         <div v-else class="flex flex-column">
-          <JobCard v-for="job in filteredJobs" :key="job.id" :job="job" @apply="handleApplyClick" />
+          <JobCard
+            v-for="job in filteredJobs"
+            :key="job.id"
+            :job="job"
+            :isApplied="jobStore.hasAppliedTo(job.id)"
+            :isApplying="applyingJobId === job.id"
+            @apply="handleApplyClick"
+          />
         </div>
       </div>
     </div>
@@ -50,6 +57,7 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { useJobStore } from "@/stores/jobStore";
+import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "primevue/usetoast";
 
 import Skeleton from "primevue/skeleton";
@@ -60,10 +68,12 @@ import Toast from "primevue/toast";
 import JobCard from "@/components/JobCard.vue";
 import JobFilters from "@/components/JobFilters.vue";
 
+const authStore = useAuthStore();
 const jobStore = useJobStore();
 const toast = useToast();
 
 const visibleMobileFilters = ref(false);
+const applyingJobId = ref(null);
 
 const currentFilters = ref({
   search: "",
@@ -97,5 +107,29 @@ const handleFilterUpdate = (newFilters) => {
   currentFilters.value = newFilters;
 };
 
-const handleApplyClick = (jobId) => {};
+const handleApplyClick = async (jobId) => {
+  applyingJobId.value = jobId;
+
+  try {
+    if (!authStore.hasAppliedTo(jobId)) {
+      await jobStore.applyToJob(jobId);
+    }
+
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: "Your application has been sent successfully!",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: error.response?.data?.message || "You already applied to this job.",
+      life: 3000,
+    });
+  } finally {
+    applyingJobId.value = null;
+  }
+};
 </script>

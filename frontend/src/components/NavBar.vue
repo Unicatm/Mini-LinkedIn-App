@@ -72,12 +72,6 @@ const items = ref([
       }),
     condition: true,
   },
-  {
-    label: "Applications",
-    icon: "pi pi-search",
-    click: () => router.push({ name: "CandidatePage" }),
-    condition: authStore.isCandidate,
-  },
 ]);
 
 const goToHome = () => {

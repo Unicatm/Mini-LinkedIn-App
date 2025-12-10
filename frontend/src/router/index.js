@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 
-import Home from "@/pages/Home.vue";
 import Register from "@/pages/Register.vue";
-import CandidatePage from "@/pages/Candidate/CandidatePage.vue";
 import RecruiterProfile from "@/pages/Recruiter/RecruiterProfile.vue";
 import CandidateProfile from "@/pages/Candidate/CandidateProfile.vue";
 import LoginPage from "@/pages/LoginPage.vue";
@@ -34,17 +32,18 @@ const router = createRouter({
       meta: { requiresAuth: true, role: "recruiter" },
     },
     {
-      path: "/candidate",
-      component: CandidatePage,
-      name: "CandidatePage",
-      meta: { requiresAuth: true, role: "candidate" },
-    },
-    {
-      path: "/candidate/profile",
+      path: "/candidate/",
       component: CandidateProfile,
       name: "CandidateProfile",
       meta: { requiresAuth: true, role: "candidate" },
     },
+    {
+      path: "/candidate/:id",
+      name: "PublicCandiateProfile",
+      component: CandidateProfile,
+      meta: { requiresAuth: true },
+    },
+
     {
       path: "/:catchAll(.*)",
       redirect: "/login",

@@ -39,34 +39,36 @@
           Posted at {{ formatDate(job.createdAt) }}
         </span>
 
-        <Button
-          v-if="isOwner"
-          icon="pi pi-trash"
-          label="Delete"
-          severity="danger"
-          text
-          size="small"
-          @click="confirmDelete($event, job.id)"
-        />
+        <div class="flex gap-2">
+          <Button
+            v-if="isOwner"
+            icon="pi pi-trash"
+            label="Delete"
+            severity="danger"
+            text
+            size="small"
+            @click="confirmDelete($event, job.id)"
+          />
 
-        <Button
-          v-if="authStore.isCandidate"
-          label="Apply"
-          icon="pi pi-send"
-          rounded
-          size="small"
-          @click="$emit('apply', job.id)"
-        />
+          <Button
+            v-if="authStore.isCandidate"
+            label="Apply"
+            icon="pi pi-send"
+            rounded
+            size="small"
+            @click="$emit('apply', job.id)"
+          />
 
-        <Button
-          v-if="!hideProfileLink && !isMyJob"
-          label="View Recruiter's profile"
-          size="small"
-          variant="text"
-          severity="secondary"
-          class="text-sm"
-          @click="goToRecruiterProfile"
-        />
+          <Button
+            v-if="!hideProfileLink && !isMyJob"
+            label="View profile"
+            size="small"
+            variant="outlined"
+            rounded
+            class="text-sm"
+            @click="goToRecruiterProfile"
+          />
+        </div>
       </div>
     </template>
   </Card>

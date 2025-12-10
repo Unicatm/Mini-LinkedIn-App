@@ -5,6 +5,7 @@ import { jobsApi } from "../api/jobsApi";
 export const useJobStore = defineStore("job", () => {
   const jobs = ref([]);
   const applications = ref([]);
+  const appliedJobIds = ref(new Set());
   const isLoading = ref(false);
   const error = ref(null);
 
@@ -46,6 +47,7 @@ export const useJobStore = defineStore("job", () => {
     try {
       const data = await jobsApi.fetchMyApplications();
       applications.value = data;
+      appliedJobIds.value = new Set(data.map((app) => app.jobId));
     } catch (err) {
       error.value = "Error retrieving applications.";
       console.error("Error at fetchMyApplications:", err);
@@ -57,6 +59,7 @@ export const useJobStore = defineStore("job", () => {
   async function applyToJob(jobId) {
     try {
       const response = await jobsApi.applyToJob(jobId);
+      appliedJobIds.value.add(jobId);
       fetchMyApplications();
       return response;
     } catch (err) {
@@ -93,6 +96,8 @@ export const useJobStore = defineStore("job", () => {
     }
   }
 
+  const hasAppliedTo = (jobId) => appliedJobIds.value.has(jobId);
+
   return {
     jobs,
     applications,
@@ -105,5 +110,6 @@ export const useJobStore = defineStore("job", () => {
     applyToJob,
     createJob,
     removeJob,
+    hasAppliedTo,
   };
 });

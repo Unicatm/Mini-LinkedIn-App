@@ -18,6 +18,7 @@ export const jobsApi = {
 
   async fetchMyApplications() {
     const response = await api.get("/applications");
+    console.log(response);
     return response.data;
   },
 
