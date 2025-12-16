@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 
-import Register from "@/pages/Register.vue";
+import RegisterPage from "@/pages/RegisterPage.vue";
 import RecruiterProfile from "@/pages/Recruiter/RecruiterProfile.vue";
 import CandidateProfile from "@/pages/Candidate/CandidateProfile.vue";
 import LoginPage from "@/pages/LoginPage.vue";
@@ -13,7 +13,7 @@ const router = createRouter({
   routes: [
     { path: "/", redirect: "/login" },
     { path: "/login", name: "Login", component: LoginPage },
-    { path: "/register", name: "Register", component: Register },
+    { path: "/register", name: "Register", component: RegisterPage },
     {
       path: "/jobs",
       component: JobsPage,
@@ -60,21 +60,19 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const userRole = authStore.user?.role;
+  const isAuthenticated = authStore.isAuthenticated;
 
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     return next({ name: "Jobs" });
   }
 
-  if (to.meta.requiresAuth) {
-    if (!authStore.isAuthenticated) {
-      return next({ name: "Login" });
-    }
-
-    if (to.meta.roles && to.meta.roles.length > 0) {
-      if (!to.meta.roles.includes(userRole)) {
-        console.warn(`Access denied for role: ${userRole}`);
-        return next({ name: "Home" });
-      }
+  if (to.meta.role && to.meta.role !== userRole) {
+    if (userRole === "recruiter") {
+      return next("/recruiter");
+    } else if (userRole === "candidate") {
+      return next("/jobs");
+    } else {
+      return next("/login");
     }
   }
   next();

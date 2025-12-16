@@ -61,6 +61,7 @@ export const useAuthStore = defineStore("auth", () => {
       isLoading.value = false;
     }
   }
+
   function logout() {
     saveState(null, null);
     router.push("/login");
