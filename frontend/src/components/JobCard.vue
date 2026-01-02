@@ -9,6 +9,17 @@
             {{ job.companySnapshot?.name || "Company" }}
           </span>
         </div>
+        <div v-if="isOwner">
+          <Button
+            icon="pi pi-ellipsis-v"
+            text
+            rounded
+            size="small"
+            @click="$emit('toggle-menu', $event)"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
+          />
+        </div>
       </div>
     </template>
 
@@ -40,16 +51,6 @@
         </span>
 
         <div class="flex gap-2">
-          <Button
-            v-if="isOwner"
-            icon="pi pi-trash"
-            label="Delete"
-            severity="danger"
-            text
-            size="small"
-            @click="confirmDelete($event, job.id)"
-          />
-
           <Button
             v-if="isOwner"
             label="Applications"
@@ -96,7 +97,7 @@ const props = defineProps({
   isOwner: { type: Boolean, default: false },
   hideProfileLink: { type: Boolean, default: false },
 });
-const emit = defineEmits(["apply", "delete"]);
+const emit = defineEmits(["apply", "toggle-menu"]);
 
 const router = useRouter();
 const authStore = useAuthStore();

@@ -78,6 +78,48 @@ exports.getMyJobs = async (req, res) => {
   }
 };
 
+exports.updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const requesterId = req.user.uid;
+
+    const jobRef = db.collection("jobs").doc(id);
+    const doc = await jobRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    const jobData = doc.data();
+
+    if (jobData.recruiterId !== requesterId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update this job." });
+    }
+
+    const fieldsToUpdate = {
+      title: updates.title,
+      description: updates.description,
+      salary: updates.salary,
+      type: updates.type,
+      updatedAt: new Date(),
+    };
+
+    await jobRef.update(fieldsToUpdate);
+
+    res.status(200).json({
+      message: "Job updated successfully",
+      id: id,
+      ...fieldsToUpdate,
+    });
+  } catch (error) {
+    console.error("Update Job Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.deleteJob = async (req, res) => {
   try {
     const { id } = req.params;

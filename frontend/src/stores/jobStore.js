@@ -102,11 +102,26 @@ export const useJobStore = defineStore("job", () => {
 
       jobs.value.unshift(response.data);
 
-      fetchJobs();
+      fetchMyJobs();
       return true;
     } catch (err) {
       error.value = err.response?.data?.message || "Error creating job.";
       throw err;
+    }
+  }
+
+  async function updateJob(jobId, updatedData) {
+    isLoading.value = true;
+    try {
+      const response = await jobsApi.updateJob(jobId, updatedData);
+      fetchMyJobs();
+
+      return response;
+    } catch (err) {
+      error.value = err.response?.data?.message || "Could not update job.";
+      throw err;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -115,7 +130,7 @@ export const useJobStore = defineStore("job", () => {
       await jobsApi.deleteJob(jobId);
 
       jobs.value = jobs.value.filter((job) => job.id !== jobId);
-      fetchJobs();
+      fetchMyJobs();
 
       return true;
     } catch (err) {
@@ -140,6 +155,7 @@ export const useJobStore = defineStore("job", () => {
     fetchApplicationsForJob,
     applyToJob,
     createJob,
+    updateJob,
     removeJob,
     hasAppliedTo,
   };
