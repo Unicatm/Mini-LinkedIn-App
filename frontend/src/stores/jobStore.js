@@ -84,9 +84,13 @@ export const useJobStore = defineStore("job", () => {
     }
   }
 
-  async function applyToJob(jobId) {
+  async function applyToJob(jobId, cvFile) {
     try {
-      const response = await jobsApi.applyToJob(jobId);
+      const formData = new FormData();
+      formData.append("jobId", jobId);
+      formData.append("cv", cvFile);
+
+      const response = await jobsApi.applyToJob(formData);
       appliedJobIds.value.add(jobId);
       fetchMyApplications();
       return response;

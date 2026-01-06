@@ -44,12 +44,17 @@
             :job="job"
             :isApplied="jobStore.hasAppliedTo(job.id)"
             :isApplying="applyingJobId === job.id"
-            @apply="handleApply"
+            @apply="openApplyDialog"
           />
         </div>
       </div>
     </div>
 
+    <ApplyJobDialog
+      v-model:visible="applyDialogVisible"
+      :job="selectedJob"
+      @application-success="handleApplicationSuccess"
+    />
     <Toast />
   </div>
 </template>
@@ -66,12 +71,14 @@ import Toast from "primevue/toast";
 
 import JobCard from "@/components/JobCard.vue";
 import JobFilters from "@/components/JobFilters.vue";
+import ApplyJobDialog from "@/components/ApplyJobDialog.vue";
 
-const { applyingJobId, handleApply } = useJobActions();
+const { applyingJobId } = useJobActions();
 const jobStore = useJobStore();
 
 const visibleMobileFilters = ref(false);
-
+const applyDialogVisible = ref(false);
+const selectedJob = ref(null);
 const currentFilters = ref({
   search: "",
   types: [],
@@ -80,6 +87,14 @@ const currentFilters = ref({
 onMounted(() => {
   jobStore.fetchJobs();
 });
+
+const openApplyDialog = (jobId) => {
+  const job = jobStore.jobs.find((j) => j.id === jobId);
+  if (job) {
+    selectedJob.value = job;
+    applyDialogVisible.value = true;
+  }
+};
 
 const filteredJobs = computed(() => {
   let jobs = jobStore.jobs || [];

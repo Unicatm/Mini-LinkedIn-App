@@ -11,8 +11,12 @@ export const jobsApi = {
     return response.data;
   },
 
-  async applyToJob(jobId) {
-    const response = await api.post("/applications", { jobId });
+  async applyToJob(formData) {
+    const response = await api.post("/applications", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   },
 

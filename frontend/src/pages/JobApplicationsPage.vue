@@ -68,13 +68,28 @@
 
           <Column header="Actions" alignFrozen="right" frozen>
             <template #body="{ data }">
-              <Button
-                label="View Profile"
-                icon="pi pi-external-link"
-                size="small"
-                text
-                @click="viewCandidateProfile(data.candidateId)"
-              />
+              <div class="flex gap-2">
+                <Button
+                  icon="pi pi-user"
+                  v-tooltip.top="'See Profile'"
+                  size="small"
+                  outlined
+                  rounded
+                  severity="info"
+                  @click="viewCandidateProfile(data.candidateId)"
+                />
+
+                <Button
+                  v-if="data.cvUrl"
+                  icon="pi pi-file-pdf"
+                  v-tooltip.top="'Open CV'"
+                  size="small"
+                  outlined
+                  rounded
+                  severity="danger"
+                  @click="openCv(data.cvUrl)"
+                />
+              </div>
             </template>
           </Column>
         </DataTable>
@@ -112,6 +127,12 @@ const viewCandidateProfile = (candidateId) => {
     name: "PublicCandiateProfile",
     params: { id: candidateId },
   });
+};
+
+const openCv = (url) => {
+  if (url) {
+    window.open(url, "_blank");
+  }
 };
 
 const getStatusSeverity = (status) => {

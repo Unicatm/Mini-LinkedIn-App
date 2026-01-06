@@ -1,4 +1,5 @@
-const db = require("../utils/dbService");
+const { db, bucket } = require("../utils/dbService");
+const path = require("path");
 
 exports.getLoggedUserProfile = async (req, res) => {
   try {
@@ -75,6 +76,85 @@ exports.updateProfile = async (req, res) => {
 
     res.status(200).json({ message: "Profile updated succesfully!" });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.uploadFile = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ message: "No file uploaded!" });
+    }
+
+    let fileObj = null;
+    let dbField = null;
+    let folder = "";
+
+    if (req.files["avatar"]) {
+      fileObj = req.files["avatar"][0];
+      dbField = "avatarUrl";
+      folder = "avatars";
+    } else if (req.files["cover"]) {
+      fileObj = req.files["cover"][0];
+      dbField = "coverUrl";
+      folder = "covers";
+    } else if (req.files["cv"]) {
+      fileObj = req.files["cv"][0];
+      dbField = "cvUrl";
+      folder = "cvs";
+    }
+
+    if (!fileObj) {
+      return res.status(400).json({ message: "No file selected" });
+    }
+
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+    const userData = userDoc.exists ? userDoc.data() : {};
+
+    if (userData.profile && userData.profile[dbField]) {
+      const oldUrl = userData.profile[dbField];
+
+      try {
+        const bucketUrlPrefix = `https://storage.googleapis.com/${bucket.name}/`;
+
+        if (oldUrl.startsWith(bucketUrlPrefix)) {
+          const oldFilePath = oldUrl.replace(bucketUrlPrefix, "");
+
+          await bucket.file(oldFilePath).delete();
+        }
+      } catch (err) {
+        console.warn("Couldn't delete old file", err.message);
+      }
+    }
+
+    const fileName = `${folder}/${userId}_${Date.now()}${path.extname(
+      fileObj.originalname
+    )}`;
+
+    const fileRef = bucket.file(fileName);
+
+    await fileRef.save(fileObj.buffer, {
+      metadata: { contentType: fileObj.mimetype },
+      public: true,
+    });
+
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+    await userRef.update({
+      [`profile.${dbField}`]: publicUrl,
+      updatedAt: new Date(),
+    });
+
+    res.status(200).json({
+      message: "Succes uploaded!",
+      url: publicUrl,
+      type: dbField,
+    });
+  } catch (error) {
+    console.error("Error at Upload:", error);
     res.status(500).json({ error: error.message });
   }
 };

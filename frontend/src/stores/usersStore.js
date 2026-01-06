@@ -60,6 +60,29 @@ export const useUsersStore = defineStore("user", () => {
     error.value = null;
   }
 
+  async function uploadFile(file, type) {
+    isLoading.value = true;
+    try {
+      const formData = new FormData();
+      formData.append(type, file);
+
+      const data = await usersApi.upload(formData);
+
+      if (myProfile.value && myProfile.value.profile) {
+        if (type === "avatar") myProfile.value.profile.avatarUrl = data.url;
+        if (type === "cover") myProfile.value.profile.coverUrl = data.url;
+        if (type === "cv") myProfile.value.profile.cvUrl = data.url;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Upload failed:", err);
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     myProfile,
     visitedProfile,
@@ -69,5 +92,6 @@ export const useUsersStore = defineStore("user", () => {
     updateMyProfile,
     fetchPublicProfile,
     clearUserData,
+    uploadFile,
   };
 });

@@ -1,14 +1,20 @@
-const db = require("../utils/dbService");
+const { db, bucket } = require("../utils/dbService");
+const path = require("path");
 
 exports.applyToJob = async (req, res) => {
   try {
     const { jobId } = req.body;
     const candidateId = req.user.uid;
+    const cvFile = req.file;
 
     if (req.user.role != "candidate") {
       return res
         .status(403)
         .json({ message: "Recruiters can't apply for jobs!" });
+    }
+
+    if (!cvFile) {
+      return res.status(400).json({ message: "CV file is required!" });
     }
 
     const existingApp = await db
@@ -26,11 +32,22 @@ exports.applyToJob = async (req, res) => {
     const jobDoc = await db.collection("jobs").doc(jobId).get();
     const jobData = jobDoc.data();
 
+    const fileName = `applications/${jobId}/${candidateId}_${Date.now()}.pdf`;
+    const fileRef = bucket.file(fileName);
+
+    await fileRef.save(cvFile.buffer, {
+      metadata: { contentType: cvFile.mimetype },
+      public: true,
+    });
+
+    const publicCvUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
     const application = {
       jobId,
       candidateId,
       recruiterId: jobData.recruiterId,
       status: "pending",
+      cvUrl: publicCvUrl,
       jobSnapshot: {
         title: jobData.title,
         companyName: jobData.companySnapshot.name,
