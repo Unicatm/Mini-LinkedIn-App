@@ -23,8 +23,7 @@
             inputId="skills-input"
             multiple
             class="w-full"
-            @item-select="save"
-            @item-unselect="save"
+            @update:modelValue="save"
             :typeahead="false"
           />
           <label for="skills-input">Add skills (press Enter)</label>
@@ -51,11 +50,14 @@ const localSkills = ref([...(props.skills || [])]);
 watch(
   () => props.skills,
   (newVal) => {
-    localSkills.value = [...(newVal || [])];
-  }
+    if (JSON.stringify(newVal) !== JSON.stringify(localSkills.value)) {
+      localSkills.value = [...(newVal || [])];
+    }
+  },
+  { deep: true }
 );
 
-const save = () => {
-  usersStore.updateMyProfile({ skills: localSkills.value });
+const save = (newSkillsList) => {
+  usersStore.updateMyProfile({ skills: newSkillsList });
 };
 </script>

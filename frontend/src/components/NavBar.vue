@@ -28,11 +28,19 @@
     </template>
     <template #end>
       <div class="flex items-center justify-center gap-3">
+        <div
+          class="w-2rem h-2rem border-circle shadow-4 bg-cover bg-center cursor-pointer"
+          :style="avatarStyle"
+          @click="goToHome"
+          v-if="avatarStyle"
+        ></div>
         <Avatar
+          v-else
           shape="circle"
           icon="pi pi-user"
           class="bg-blue-100 cursor-pointer"
           @click="goToHome"
+          style="object-fit: cover"
         />
         <Button
           label="Logout"
@@ -48,13 +56,27 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+
 import { useRouter } from "vue-router";
+
 import { Avatar, Menubar, Badge, Button } from "primevue";
+
 import { useAuthStore } from "@/stores/authStore";
+import { useUsersStore } from "@/stores/usersStore";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const usersStore = useUsersStore();
+
+const avatarImage = computed(() => usersStore?.myProfile?.profile?.avatarUrl || null);
+
+const avatarStyle = computed(() => {
+  if (avatarImage.value) {
+    return { backgroundImage: `url(${avatarImage.value})` };
+  }
+  return null;
+});
 
 const items = ref([
   {

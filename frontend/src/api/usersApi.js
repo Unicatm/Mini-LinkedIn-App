@@ -3,6 +3,7 @@ import api from "./index";
 export const usersApi = {
   async fetchMyProfile() {
     const response = await api.get("/users/profile");
+    // console.log(response.data);
     return response.data;
   },
 

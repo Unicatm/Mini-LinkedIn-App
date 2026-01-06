@@ -41,6 +41,7 @@ exports.getPublicProfile = async (req, res) => {
       role: userData.role,
       profile: userData.profile,
       email: userData.email,
+      avatarUrl: userData.avatarUrl,
     };
 
     const jobsSnapshot = await db
