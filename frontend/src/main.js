@@ -1,15 +1,26 @@
-import { createApp } from "vue";
-import PrimeVue from "primevue/config";
-import Aura from "@primeuix/themes/aura";
+import "primeicons/primeicons.css";
+import "primeflex/primeflex.css";
 
-import "./style.css";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import PrimeVue from "primevue/config";
+import Lara from "@primeuix/themes/lara";
+
 import App from "./App.vue";
+import router from "./router";
 
 const app = createApp(App);
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset: Lara,
+    options: {
+      prefix: "p",
+      darkModeSelector: "none",
+    },
   },
 });
 
-createApp(App).mount("#app");
+app.use(createPinia());
+app.use(router);
+
+app.mount("#app");

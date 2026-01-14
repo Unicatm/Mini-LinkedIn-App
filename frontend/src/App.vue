@@ -1,7 +1,14 @@
 <script setup>
-import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
 <template>
-  <HelloWorld msg="Vite + Vue" />
+  <main class="flex-1">
+    <router-view />
+  </main>
 </template>
+
+<style>
+* {
+  font-family: "Poppins";
+}
+</style>
