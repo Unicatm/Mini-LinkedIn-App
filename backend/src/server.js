@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "../.env" });
 
 const app = require("./app");
+require("./utils/dbService");
 
 const port = process.env.PORT || 5000;
 

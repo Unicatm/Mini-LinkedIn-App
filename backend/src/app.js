@@ -1,16 +1,18 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 
 const app = express();
-
-dotenv.config({ path: "../.env" });
 
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("App is workingggg!!!");
-});
+const jobsRoutes = require("./routes/jobsRoutes");
+const applicationsRoutes = require("./routes/applicationsRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+
+app.use("/api/jobs", jobsRoutes);
+app.use("/api/applications", applicationsRoutes);
 
 module.exports = app;
