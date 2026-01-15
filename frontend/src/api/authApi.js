@@ -10,13 +10,4 @@ export const authApi = {
     const response = await api.post("/auth/register", userData);
     return response.data;
   },
-
-  async fetchProfile() {
-    const response = await api.get("/auth/profile");
-    return response.data;
-  },
-
-  async updateProfile(profileData) {
-    return api.put("/auth/profile", profileData);
-  },
 };

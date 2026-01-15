@@ -58,29 +58,6 @@ export const useAuthStore = defineStore("auth", () => {
     router.push("/login");
   }
 
-  async function fetchUserProfile() {
-    try {
-      const userData = await authApi.fetchProfile();
-      user.value = userData;
-
-      localStorage.setItem("user", JSON.stringify(userData));
-    } catch (err) {
-      if (err.response?.status === 401) {
-        logout();
-      }
-    }
-  }
-
-  async function updateProfile(profileData) {
-    try {
-      await authApi.updateProfile(profileData);
-      user.value.profile = { ...user.value.profile, ...profileData };
-    } catch (err) {
-      error.value = "Could not update profile.";
-      throw err;
-    }
-  }
-
   return {
     error,
     token,
@@ -91,7 +68,5 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     register,
     logout,
-    fetchUserProfile,
-    updateProfile,
   };
 });
