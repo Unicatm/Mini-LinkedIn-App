@@ -11,6 +11,20 @@
             {{ job.companySnapshot?.name || "Company" }}
           </span>
         </div>
+
+        <div v-if="isOwner" class="card flex justify-center">
+          <Button
+            type="button"
+            icon="pi pi-ellipsis-v"
+            @click="toggle"
+            text
+            rounded
+            severity="secondary"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
+          />
+          <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+        </div>
       </div>
     </template>
 
@@ -42,33 +56,47 @@
           <i class="pi pi-calendar mr-1"></i>
           Posted at {{ formatDate(job.createdAt) }}
         </span>
-
-        <Button
-          v-if="isOwner"
-          icon="pi pi-trash"
-          label="Delete"
-          severity="danger"
-          text
-          size="small"
-          @click="$emit('delete', job.id)"
-        />
       </div>
     </template>
   </Card>
 </template>
 
 <script setup>
-import Card from "primevue/card";
-import Tag from "primevue/tag";
-import Button from "primevue/button";
+import { ref } from "vue";
+
+import { Menu, Button, Tag, Card } from "primevue";
 
 const props = defineProps({
   job: Object,
   isApplied: Boolean,
   isOwner: { type: Boolean, default: false },
-  hideProfileLink: { type: Boolean, default: false },
 });
-const emit = defineEmits(["apply", "delete"]);
+const emit = defineEmits(["apply", "delete", "edit"]);
+
+const menu = ref();
+const items = ref([
+  {
+    items: [
+      {
+        label: "Edit",
+        icon: "pi pi-pencil",
+        command: () => {
+          emit("edit", props.job);
+        },
+      },
+      {
+        label: "Delete",
+        icon: "pi pi-trash",
+        command: () => {
+          emit("delete", props.job.id);
+        },
+      },
+    ],
+  },
+]);
+const toggle = (event) => {
+  menu.value.toggle(event);
+};
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "";

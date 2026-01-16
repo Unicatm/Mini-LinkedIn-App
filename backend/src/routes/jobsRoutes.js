@@ -8,17 +8,23 @@ router.get(
   "/my-jobs",
   verifyToken,
   checkRole("recruiter"),
-  jobsController.getMyJobs
+  jobsController.getMyJobs,
 );
 
 router.get("/", verifyToken, jobsController.getAllJobs);
 
 router.post("/", verifyToken, checkRole("recruiter"), jobsController.createJob);
+router.put(
+  "/:id",
+  verifyToken,
+  checkRole("recruiter"),
+  jobsController.updateJob,
+);
 router.delete(
   "/:id",
   verifyToken,
   checkRole("recruiter"),
-  jobsController.deleteJob
+  jobsController.deleteJob,
 );
 
 module.exports = router;

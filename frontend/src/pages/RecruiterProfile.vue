@@ -15,20 +15,7 @@
       <div class="col-12 md:col-8 lg:col-9">
         <JobCreateForm v-if="!isReadOnly" :readOnly="isReadOnly" />
 
-        <div v-if="currentJobs.length === 0" class="text-center text-500 mt-5">
-          You have not posted any active jobs at the moment.
-        </div>
-
-        <div v-else class="flex flex-column gap-4 mt-4">
-          <JobCard
-            v-for="job in currentJobs"
-            :key="job.id"
-            :job="job"
-            :isOwner="!isReadOnly"
-            :hideProfileLink="true"
-            @delete="deleteJob(job.id)"
-          />
-        </div>
+        <RecruitersJobList :jobs="currentJobs" :isReadOnly="isReadOnly" />
       </div>
     </div>
   </div>
@@ -43,8 +30,8 @@ import { useUsersStore } from "@/stores/userStore";
 
 import RecruiterHeader from "@/components/recruiter/RecruiterHeader.vue";
 import RecruiterBio from "@/components/recruiter/RecruiterBio.vue";
-import JobCard from "@/components/JobCard.vue";
 import JobCreateForm from "@/components/recruiter/forms/JobCreateForm.vue";
+import RecruitersJobList from "@/components/recruiter/RecruitersJobList.vue";
 
 import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
@@ -53,7 +40,6 @@ const route = useRoute();
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
 const jobStore = useJobStore();
-const toast = useToast();
 
 const error = ref(null);
 
@@ -76,28 +62,6 @@ const currentJobs = computed(() => {
     ? usersStore.visitedProfile?.jobs || []
     : jobStore.jobs;
 });
-
-const deleteJob = async (jobId) => {
-  try {
-    await jobStore.removeJob(jobId);
-
-    toast.add({
-      severity: "success",
-      summary: "Succes",
-      detail: "The job was deleted successfully.",
-      life: 3000,
-    });
-  } catch (error) {
-    console.error(error);
-
-    toast.add({
-      severity: "error",
-      summary: "Error",
-      detail: "The job could not be deleted. Please try again.",
-      life: 3000,
-    });
-  }
-};
 
 const loadData = async () => {
   error.value = null;
@@ -127,6 +91,6 @@ watch(
   () => route.params.id,
   () => {
     loadData();
-  }
+  },
 );
 </script>

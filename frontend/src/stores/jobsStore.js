@@ -8,7 +8,7 @@ export const useJobStore = defineStore("job", () => {
   const error = ref(null);
 
   const activeJobs = computed(() =>
-    jobs.value.filter((job) => job.status === "active")
+    jobs.value.filter((job) => job.status === "active"),
   );
 
   async function fetchJobs() {
@@ -68,6 +68,19 @@ export const useJobStore = defineStore("job", () => {
     }
   }
 
+  async function updateJob(jobId, updatedData) {
+    try {
+      const response = await jobsApi.updateJob(jobId, updatedData);
+      console.log(response);
+      fetchMyJobs();
+
+      return response;
+    } catch (err) {
+      error.value = err.response?.data?.message || "Could not update job.";
+      throw err;
+    }
+  }
+
   async function removeJob(jobId) {
     try {
       await jobsApi.deleteJob(jobId);
@@ -89,6 +102,7 @@ export const useJobStore = defineStore("job", () => {
     fetchMyApplications,
     applyToJob,
     createJob,
+    updateJob,
     removeJob,
   };
 });

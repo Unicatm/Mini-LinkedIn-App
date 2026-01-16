@@ -5,7 +5,7 @@ import { authApi } from "../api/authApi";
 
 export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("jwtToken") || null);
-  const user = ref(localStorage.getItem("user") || null);
+  const user = ref(JSON.parse(localStorage.getItem("user")) || null);
   const error = ref(null);
 
   const isAuth = computed(() => !!token.value);
@@ -27,9 +27,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function login(credentials) {
     try {
-      const { token: newToken, user: newUser } = await authApi.login(
-        credentials
-      );
+      const { token: newToken, user: newUser } =
+        await authApi.login(credentials);
 
       saveState(newToken, newUser);
       if (newUser.role === "recruiter") {

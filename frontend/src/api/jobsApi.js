@@ -26,6 +26,11 @@ export const jobsApi = {
     return response.data;
   },
 
+  async updateJob(jobId, jobData) {
+    const response = await api.put(`/jobs/${jobId}`, jobData);
+    return response.data;
+  },
+
   async deleteJob(jobId) {
     return api.delete(`/jobs/${jobId}`);
   },
