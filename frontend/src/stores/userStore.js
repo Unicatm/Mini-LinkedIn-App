@@ -36,10 +36,7 @@ export const useUsersStore = defineStore("user", () => {
   async function updateMyProfile(updates) {
     try {
       await usersApi.updateMyProfile(updates);
-
-      if (myProfile.value && myProfile.value.profile) {
-        myProfile.value.profile = { ...myProfile.value.profile, ...updates };
-      }
+      fetchMyProfile();
     } catch (err) {
       error.value = "Could not update profile.";
       throw err;

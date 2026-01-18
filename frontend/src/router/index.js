@@ -43,7 +43,13 @@ const router = createRouter({
       path: "/candidate",
       component: CandidateProfile,
       name: "CandidateProfile",
-      meta: { requiresAuth: true, roles: ["recruiter"] },
+      meta: { requiresAuth: true, roles: ["candidate"] },
+    },
+    {
+      path: "/candidate/:id",
+      name: "PublicCandiateProfile",
+      component: CandidateProfile,
+      meta: { requiresAuth: true },
     },
     {
       path: "/:catchAll(.*)",
@@ -67,7 +73,7 @@ router.beforeEach(async (to, from, next) => {
 
     if (to.meta.roles && !to.meta.roles.includes(userRole)) {
       console.warn(
-        `Access denied. User role: ${userRole}, Required: ${to.meta.roles}`
+        `Access denied. User role: ${userRole}, Required: ${to.meta.roles}`,
       );
       if (userRole === "recruiter") return next({ name: "RecruiterProfile" });
       if (userRole === "candidate") return next({ name: "CandidateProfile" });

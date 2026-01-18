@@ -3,14 +3,14 @@
     <NavBar v-if="showNavBar" />
 
     <main class="flex-1">
-      <router-view />
+      <RouterView />
     </main>
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, RouterView } from "vue-router";
 
 import NavBar from "./components/NavBar.vue";
 

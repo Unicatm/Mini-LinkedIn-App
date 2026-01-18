@@ -9,32 +9,15 @@
       </span>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
-      <a
-        @click="item.click"
+      <RouterLink
+        :to="item.to"
         v-if="item.condition"
         v-ripple
         class="flex items-center"
         v-bind="props.action"
       >
         <span>{{ item.label }}</span>
-        <Badge
-          v-if="item.badge"
-          :class="{ 'ml-auto': !root, 'ml-2': root }"
-          :value="item.badge"
-        />
-        <span
-          v-if="item.shortcut"
-          class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
-          >{{ item.shortcut }}</span
-        >
-        <i
-          v-if="hasSubmenu"
-          :class="[
-            'pi pi-angle-down ml-auto',
-            { 'pi-angle-down': root, 'pi-angle-right': !root },
-          ]"
-        ></i>
-      </a>
+      </RouterLink>
     </template>
     <template #end>
       <div class="flex items-center justify-center gap-3">
@@ -70,16 +53,13 @@ const items = ref([
   {
     label: "Jobs",
     icon: "pi pi-home",
-    click: () => router.push({ name: "JobsPage" }),
     condition: true,
+    to: "/jobs",
   },
   {
     label: "Profile",
     icon: "pi pi-home",
-    click: () =>
-      router.push({
-        name: authStore.isRecruiter ? "RecruiterProfile" : "CandidateProfile",
-      }),
+    to: authStore.isRecruiter ? "/recruiter" : "/candidate",
     condition: true,
   },
 ]);

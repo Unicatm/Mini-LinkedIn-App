@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
+import { ref } from "vue";
 import { useUsersStore } from "@/stores/userStore";
 
 import { Card, Button, InputText, Textarea } from "primevue";
@@ -111,28 +111,8 @@ const props = defineProps({
 
 const usersStore = useUsersStore();
 
-const profileData = computed(() => {
-  if (props.readOnly) {
-    const data = props.profileData || {};
-    return {
-      bio: data.bio || "",
-      companyName: data.companyName || "",
-      website: data.website || "",
-      location: data.location || "",
-    };
-  }
-
-  const storeProfile = usersStore.myProfile?.profile || {};
-  return {
-    bio: storeProfile.bio || "",
-    companyName: storeProfile.companyName || "",
-    website: storeProfile.website || "",
-    location: storeProfile.location || "",
-  };
-});
-
 const isEditing = ref(false);
-const formData = reactive({
+const formData = ref({
   bio: "",
   website: "",
   location: "",
@@ -143,16 +123,20 @@ const toggleEdit = () => {
   if (props.readOnly) return;
 
   if (!isEditing.value) {
-    formData.bio = profileData.value.bio;
-    formData.companyName = profileData.value.companyName;
-    formData.website = profileData.value.website;
-    formData.location = profileData.value.location;
+    formData.value = {
+      bio: props.profileData.bio,
+      companyName: props.profileData.companyName,
+      website: props.profileData.website,
+      location: props.profileData.location,
+    };
+  } else {
+    saveProfile();
   }
   isEditing.value = !isEditing.value;
 };
 
 const saveProfile = async () => {
-  await usersStore.updateMyProfile({ ...formData });
+  await usersStore.updateMyProfile({ ...formData.value });
   isEditing.value = false;
 };
 </script>
