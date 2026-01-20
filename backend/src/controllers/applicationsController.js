@@ -65,12 +65,11 @@ exports.getApplications = async (req, res) => {
         .where("candidateId", "==", req.user.uid);
     }
 
-    const snapshot = await query.orderBy("appliedAt", "desc").get();
+    const snapshot = await query.get();
     const applications = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
     res.status(200).json(applications);
   } catch (error) {
     res.status(500).json({ error: error.message });

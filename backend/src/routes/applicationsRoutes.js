@@ -8,7 +8,7 @@ router.post(
   "/",
   verifyToken,
   checkRole("candidate"),
-  applicationsController.applyToJob
+  applicationsController.applyToJob,
 );
 router.get("/", verifyToken, applicationsController.getApplications);
 

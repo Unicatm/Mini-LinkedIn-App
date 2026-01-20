@@ -52,10 +52,21 @@
       <div
         class="flex justify-content-between align-items-center border-top-1 border-200 pt-3"
       >
-        <span class="text-sm text-500">
-          <i class="pi pi-calendar mr-1"></i>
-          Posted at {{ formatDate(job.createdAt) }}
-        </span>
+        <div class="flex justify-content-between align-items-center pt-3">
+          <span class="text-sm text-500">
+            <i class="pi pi-calendar mr-1"></i>
+            Posted at {{ formatDate(job.createdAt) }}
+          </span>
+        </div>
+        <Button
+          v-if="authStore.isCandidate"
+          label="Apply"
+          icon="pi pi-send"
+          outlined
+          rounded
+          size="small"
+          @click="$emit('apply', job.id)"
+        />
       </div>
     </template>
   </Card>
@@ -63,8 +74,11 @@
 
 <script setup>
 import { ref } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 
 import { Menu, Button, Tag, Card } from "primevue";
+
+const authStore = useAuthStore();
 
 const props = defineProps({
   job: Object,
