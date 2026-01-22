@@ -4,7 +4,7 @@
       You have not posted any active jobs at the moment.
     </div>
 
-    <div v-else class="flex flex-column gap-4 mt-4">
+    <div v-else class="flex flex-column gap-4">
       <JobCard
         v-for="job in jobs"
         :job="job"

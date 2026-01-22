@@ -75,7 +75,7 @@ const loadData = async () => {
     } else {
       await Promise.all([usersStore.fetchMyProfile(), jobStore.fetchMyJobs()]);
 
-      console.log(jobStore.jobs);
+      // console.log(jobStore.jobs);
     }
   } catch (e) {
     console.error(e);

@@ -14,6 +14,12 @@ router.get(
 router.get("/", verifyToken, jobsController.getAllJobs);
 
 router.post("/", verifyToken, checkRole("recruiter"), jobsController.createJob);
+router.get(
+  "/:id",
+  verifyToken,
+  checkRole("recruiter"),
+  jobsController.getJobById,
+);
 router.put(
   "/:id",
   verifyToken,

@@ -51,19 +51,39 @@ exports.applyToJob = async (req, res) => {
   }
 };
 
+exports.getJobApplications = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const recruiterId = req.user.uid;
+
+    const jobDoc = await db.collection("jobs").doc(jobId).get();
+    if (!jobDoc.exists || jobDoc.data().recruiterId !== recruiterId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view these applications." });
+    }
+
+    const snapshot = await db
+      .collection("applications")
+      .where("jobId", "==", jobId)
+      .get();
+
+    const applications = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(applications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getApplications = async (req, res) => {
   try {
-    let query;
-
-    if (req.user.role == "recruiter") {
-      query = db
-        .collection("applications")
-        .where("recruiterId", "==", req.user.uid);
-    } else {
-      query = db
-        .collection("applications")
-        .where("candidateId", "==", req.user.uid);
-    }
+    let query = db
+      .collection("applications")
+      .where("candidateId", "==", req.user.uid);
 
     const snapshot = await query.get();
     const applications = snapshot.docs.map((doc) => ({

@@ -6,6 +6,11 @@ export const jobsApi = {
     return response.data;
   },
 
+  async getJobById(jobId) {
+    const response = await api.get(`/jobs/${jobId}`);
+    return response.data;
+  },
+
   async fetchMyJobs() {
     const response = await api.get("/jobs/my-jobs");
     return response.data;
@@ -19,6 +24,11 @@ export const jobsApi = {
   async fetchMyApplications() {
     const response = await api.get("/applications");
     console.log(response);
+    return response.data;
+  },
+
+  async fetchApplicationsForJob(jobId) {
+    const response = await api.get(`/applications/job/${jobId}`);
     return response.data;
   },
 

@@ -5,8 +5,8 @@
         <CandidateHeader :user="currentUser" :readOnly="isReadOnly" />
       </div>
 
-      <div class="grid w-full max-w-7xl mx-auto px-4 mt-4">
-        <div class="col-12 md:col-4">
+      <div class="grid w-6xl max-w-7xl mx-auto px-4 mt-4">
+        <div class="col-12 md:col-3">
           <div class="flex flex-column gap-4 pt-1rem">
             <CandidateBio
               :profileData="currentUser?.profile"
@@ -15,7 +15,7 @@
           </div>
         </div>
 
-        <div class="col-12 md:col-8">
+        <div class="col-12 md:col-9">
           <Tabs value="0">
             <TabList class="bg-white-alpha-20">
               <Tab value="0" class="flex align-items-center gap-2">

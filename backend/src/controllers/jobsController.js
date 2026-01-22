@@ -32,6 +32,24 @@ exports.createJob = async (req, res) => {
   }
 };
 
+exports.getJobById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const jobDoc = await db.collection("jobs").doc(id).get();
+
+    if (!jobDoc.exists) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    res.status(200).json({
+      id: jobDoc.id,
+      ...jobDoc.data(),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.updateJob = async (req, res) => {
   try {
     const { id } = req.params;

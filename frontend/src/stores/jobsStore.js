@@ -23,6 +23,18 @@ export const useJobStore = defineStore("job", () => {
     }
   }
 
+  async function fetchJobById(jobId) {
+    error.value = null;
+    try {
+      const data = await jobsApi.getJobById(jobId);
+      console.log(data);
+      return data;
+    } catch (err) {
+      error.value = "Error retrieving that job.";
+      console.error("Error at fetchJobById:", err);
+    }
+  }
+
   async function fetchMyJobs() {
     error.value = null;
     try {
@@ -36,13 +48,22 @@ export const useJobStore = defineStore("job", () => {
   }
 
   async function fetchMyApplications() {
-    error.value = null;
     try {
       const data = await jobsApi.fetchMyApplications();
       applications.value = data;
     } catch (err) {
       error.value = "Error retrieving applications.";
       console.error("Error at fetchMyApplications:", err);
+    }
+  }
+
+  async function fetchApplicationsForJob(jobId) {
+    try {
+      const response = await jobsApi.fetchApplicationsForJob(jobId);
+      console.log(response);
+      return response;
+    } catch (err) {
+      error.value = "Could not fetch applications.";
     }
   }
 
@@ -98,8 +119,10 @@ export const useJobStore = defineStore("job", () => {
     error,
     activeJobs,
     fetchJobs,
+    fetchJobById,
     fetchMyJobs,
     fetchMyApplications,
+    fetchApplicationsForJob,
     applyToJob,
     createJob,
     updateJob,

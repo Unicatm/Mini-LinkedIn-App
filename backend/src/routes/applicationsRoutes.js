@@ -10,6 +10,17 @@ router.post(
   checkRole("candidate"),
   applicationsController.applyToJob,
 );
-router.get("/", verifyToken, applicationsController.getApplications);
+router.get(
+  "/",
+  verifyToken,
+  checkRole("candidate"),
+  applicationsController.getApplications,
+);
+router.get(
+  "/job/:jobId",
+  verifyToken,
+  checkRole("recruiter"),
+  applicationsController.getJobApplications,
+);
 
 module.exports = router;

@@ -67,6 +67,14 @@
           size="small"
           @click="$emit('apply', job.id)"
         />
+        <Button
+          v-if="isOwner && isMyJob"
+          label="View Applications"
+          outlined
+          rounded
+          size="small"
+          @click="goToApplications(job.id)"
+        />
       </div>
     </template>
   </Card>
@@ -74,11 +82,12 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
 import { useAuthStore } from "@/stores/authStore";
+import { formatDate } from "@/utils/formateDate";
 
 import { Menu, Button, Tag, Card } from "primevue";
-
-const authStore = useAuthStore();
 
 const props = defineProps({
   job: Object,
@@ -86,6 +95,10 @@ const props = defineProps({
   isOwner: { type: Boolean, default: false },
 });
 const emit = defineEmits(["apply", "delete", "edit"]);
+
+const router = useRouter();
+const authStore = useAuthStore();
+const isMyJob = props.job.recruiterId == authStore.user.uid;
 
 const menu = ref();
 const items = ref([
@@ -112,14 +125,10 @@ const toggle = (event) => {
   menu.value.toggle(event);
 };
 
-const formatDate = (timestamp) => {
-  if (!timestamp) return "";
-  const date = timestamp._seconds
-    ? new Date(timestamp._seconds * 1000)
-    : new Date(timestamp);
-  return date.toLocaleDateString("ro-RO", {
-    month: "short",
-    day: "numeric",
+const goToApplications = (jobId) => {
+  router.push({
+    name: "ApplicationsPage",
+    params: { id: jobId },
   });
 };
 </script>
