@@ -5,6 +5,7 @@ import { jobsApi } from "../api/jobsApi";
 export const useJobStore = defineStore("job", () => {
   const jobs = ref([]);
   const applications = ref([]);
+  const applicationsIds = ref([]);
   const error = ref(null);
 
   const activeJobs = computed(() =>
@@ -27,7 +28,7 @@ export const useJobStore = defineStore("job", () => {
     error.value = null;
     try {
       const data = await jobsApi.getJobById(jobId);
-      console.log(data);
+      // console.log(data);
       return data;
     } catch (err) {
       error.value = "Error retrieving that job.";
@@ -50,7 +51,14 @@ export const useJobStore = defineStore("job", () => {
   async function fetchMyApplications() {
     try {
       const data = await jobsApi.fetchMyApplications();
+      let arr = [];
+      data.forEach((appl) => {
+        arr.push(appl.jobId);
+      });
+      applicationsIds.value = arr;
       applications.value = data;
+
+      console.log(applicationsIds.value);
     } catch (err) {
       error.value = "Error retrieving applications.";
       console.error("Error at fetchMyApplications:", err);
@@ -60,7 +68,7 @@ export const useJobStore = defineStore("job", () => {
   async function fetchApplicationsForJob(jobId) {
     try {
       const response = await jobsApi.fetchApplicationsForJob(jobId);
-      console.log(response);
+      // console.log(response);
       return response;
     } catch (err) {
       error.value = "Could not fetch applications.";
@@ -116,6 +124,7 @@ export const useJobStore = defineStore("job", () => {
   return {
     jobs,
     applications,
+    applicationsIds,
     error,
     activeJobs,
     fetchJobs,

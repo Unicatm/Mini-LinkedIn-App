@@ -5,6 +5,13 @@
     <template #title>
       <div class="flex justify-content-between align-items-start">
         <div class="flex flex-column">
+          <Tag
+            v-if="hasApplied()"
+            value="Applied"
+            severity="secondary"
+            rounded
+            class="w-fit mb-2"
+          />
           <span class="text-xl font-bold">{{ job.title }}</span>
           <span class="text-sm text-500 font-medium mt-1">
             <i class="pi pi-building mr-1 text-xs"></i>
@@ -58,23 +65,33 @@
             Posted at {{ formatDate(job.createdAt) }}
           </span>
         </div>
-        <Button
-          v-if="authStore.isCandidate"
-          label="Apply"
-          icon="pi pi-send"
-          outlined
-          rounded
-          size="small"
-          @click="$emit('apply', job.id)"
-        />
-        <Button
-          v-if="isOwner && isMyJob"
-          label="View Applications"
-          outlined
-          rounded
-          size="small"
-          @click="goToApplications(job.id)"
-        />
+        <div class="flex gap-2">
+          <Button
+            v-if="authStore.isCandidate"
+            label="Apply"
+            icon="pi pi-send"
+            outlined
+            rounded
+            size="small"
+            @click="$emit('apply', job.id)"
+          />
+          <Button
+            v-if="isOwner && isMyJob"
+            label="Applications"
+            outlined
+            rounded
+            size="small"
+            @click="goToApplications(job.id)"
+          />
+          <Button
+            v-if="!isOwner && !isMyJob"
+            label="Recruiter's Page"
+            variant="text"
+            rounded
+            size="small"
+            @click="goToRecruitersPage(job.recruiterId)"
+          />
+        </div>
       </div>
     </template>
   </Card>
@@ -88,6 +105,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { formatDate } from "@/utils/formateDate";
 
 import { Menu, Button, Tag, Card } from "primevue";
+import { useJobStore } from "@/stores/jobsStore";
 
 const props = defineProps({
   job: Object,
@@ -99,6 +117,7 @@ const emit = defineEmits(["apply", "delete", "edit"]);
 const router = useRouter();
 const authStore = useAuthStore();
 const isMyJob = props.job.recruiterId == authStore.user.uid;
+const jobStore = useJobStore();
 
 const menu = ref();
 const items = ref([
@@ -130,5 +149,16 @@ const goToApplications = (jobId) => {
     name: "ApplicationsPage",
     params: { id: jobId },
   });
+};
+
+const goToRecruitersPage = (recruiterId) => {
+  router.push({
+    name: "PublicRecruiterProfile",
+    params: { id: recruiterId },
+  });
+};
+
+const hasApplied = () => {
+  return jobStore.applicationsIds.includes(props.job.id) ? true : false;
 };
 </script>

@@ -32,8 +32,10 @@ import { useJobStore } from "@/stores/jobsStore";
 import JobCard from "@/components/JobCard.vue";
 
 import { Toast, useToast } from "primevue";
+import { useAuthStore } from "@/stores/authStore";
 
 const toast = useToast();
+const authStore = useAuthStore();
 const jobStore = useJobStore();
 
 const applyToJob = async (jobId) => {
@@ -56,7 +58,10 @@ const applyToJob = async (jobId) => {
   }
 };
 
-onMounted(() => {
-  jobStore.fetchJobs();
+onMounted(async () => {
+  await jobStore.fetchJobs();
+  if (authStore.isCandidate) {
+    await jobStore.fetchMyApplications();
+  }
 });
 </script>
