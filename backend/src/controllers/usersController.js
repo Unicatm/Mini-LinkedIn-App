@@ -1,4 +1,5 @@
-const db = require("../utils/dbService");
+const { db } = require("../utils/dbService");
+const uploadFileHelper = require("../utils/uploadFileHelper");
 
 exports.getLoggedUserProfile = async (req, res) => {
   try {
@@ -78,4 +79,12 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+exports.uploadCover = (req, res) => {
+  uploadFileHelper(req, res, "covers", "coverUrl");
+};
+
+exports.uploadAvatar = (req, res) => {
+  uploadFileHelper(req, res, "avatars", "avatarUrl");
 };

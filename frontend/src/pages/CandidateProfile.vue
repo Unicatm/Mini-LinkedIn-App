@@ -89,7 +89,7 @@ onMounted(async () => {
       ]);
     }
   } catch (error) {
-    console.error(e);
+    console.error(error);
   }
 });
 </script>

@@ -1,4 +1,4 @@
-const db = require("../utils/dbService");
+const { db, bucket } = require("../utils/dbService");
 
 exports.applyToJob = async (req, res) => {
   try {
@@ -39,7 +39,6 @@ exports.applyToJob = async (req, res) => {
       candidateSnapshot: {
         name: req.user.profile?.fullName || "Anonim",
         email: req.user.email,
-        skills: req.user.profile?.skills || [],
       },
       appliedAt: new Date(),
     };
@@ -47,6 +46,7 @@ exports.applyToJob = async (req, res) => {
     await db.collection("applications").add(application);
     res.status(201).json({ message: "Successfully applied!" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };

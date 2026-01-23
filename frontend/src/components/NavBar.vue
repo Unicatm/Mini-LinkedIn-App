@@ -22,8 +22,9 @@
     <template #end>
       <div class="flex items-center justify-center gap-3">
         <Avatar
+          :image="avatarUrl"
+          :icon="avatarUrl ? null : 'pi pi-user'"
           shape="circle"
-          icon="pi pi-user"
           class="bg-blue-100 cursor-pointer"
           @click="goToHome"
         />
@@ -41,13 +42,19 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Avatar, Menubar, Badge, Button } from "primevue";
+import { Avatar, Menubar, Button } from "primevue";
 import { useAuthStore } from "@/stores/authStore";
+import { useUsersStore } from "@/stores/userStore";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const userStore = useUsersStore();
+
+const avatarUrl = computed(
+  () => userStore?.myProfile?.profile?.avatarUrl || null,
+);
 
 const items = ref([
   {

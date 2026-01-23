@@ -1,4 +1,4 @@
-const db = require("../utils/dbService");
+const {db} = require("../utils/dbService");
 
 exports.createJob = async (req, res) => {
   try {

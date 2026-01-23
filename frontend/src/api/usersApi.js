@@ -15,4 +15,16 @@ export const usersApi = {
   async updateMyProfile(profileData) {
     return api.put("/users/profile", profileData);
   },
+
+  async uploadFile(file, type) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post(`/users/${type}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
 };
