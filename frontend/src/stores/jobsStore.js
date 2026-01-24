@@ -75,9 +75,9 @@ export const useJobStore = defineStore("job", () => {
     }
   }
 
-  async function applyToJob(jobId) {
+  async function applyToJob(jobId, file) {
     try {
-      const response = await jobsApi.applyToJob(jobId);
+      const response = await jobsApi.applyToJob(jobId, file);
       fetchMyApplications();
       return response;
     } catch (err) {

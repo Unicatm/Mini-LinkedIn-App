@@ -4,6 +4,7 @@ exports.applyToJob = async (req, res) => {
   try {
     const { jobId } = req.body;
     const candidateId = req.user.uid;
+    const file = req.file;
 
     if (req.user.role != "candidate") {
       return res
@@ -23,6 +24,43 @@ exports.applyToJob = async (req, res) => {
         .json({ message: "You have already applied for this job!" });
     }
 
+    let cvUrl;
+
+    if (file) {
+      cvUrl = await new Promise((resolve, reject) => {
+        const fileName = `applications/${jobId}/${candidateId}_${Date.now()}_${file.originalname}`;
+        const fileUpload = bucket.file(fileName);
+
+        const blobStream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+
+        blobStream.on("error", (error) => {
+          reject(error);
+        });
+
+        blobStream.on("finish", async () => {
+          try {
+            const [url] = await fileUpload.getSignedUrl({
+              action: "read",
+              expires: "01-01-2050",
+            });
+            resolve(url);
+          } catch (err) {
+            reject(err);
+          }
+        });
+
+        blobStream.end(file.buffer);
+      });
+    }
+
+    if (!cvUrl) {
+      return res.status(400).json({ message: "Please upload a CV to apply." });
+    }
+
     const jobDoc = await db.collection("jobs").doc(jobId).get();
     const jobData = jobDoc.data();
 
@@ -31,6 +69,7 @@ exports.applyToJob = async (req, res) => {
       candidateId,
       recruiterId: jobData.recruiterId,
       status: "pending",
+      cvUrl,
       jobSnapshot: {
         title: jobData.title,
         companyName: jobData.companySnapshot.name,
@@ -47,6 +86,34 @@ exports.applyToJob = async (req, res) => {
     res.status(201).json({ message: "Successfully applied!" });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getJobApplications = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const recruiterId = req.user.uid;
+
+    const jobDoc = await db.collection("jobs").doc(jobId).get();
+    if (!jobDoc.exists || jobDoc.data().recruiterId !== recruiterId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view these applications." });
+    }
+
+    const snapshot = await db
+      .collection("applications")
+      .where("jobId", "==", jobId)
+      .get();
+
+    const applications = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(applications);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };

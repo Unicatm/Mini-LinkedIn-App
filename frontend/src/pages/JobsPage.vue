@@ -17,8 +17,9 @@
             v-for="job in jobStore.jobs"
             :key="job.id"
             :job="job"
-            @apply="applyToJob"
+            @apply="openApplyDialog(job)"
           />
+          <ApplyDialog v-model:visible="showDialog" :job="selectedJob" />
         </div>
       </div>
     </div>
@@ -26,17 +27,21 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useJobStore } from "@/stores/jobsStore";
 
 import JobCard from "@/components/JobCard.vue";
 
 import { Toast, useToast } from "primevue";
 import { useAuthStore } from "@/stores/authStore";
+import ApplyDialog from "@/components/ApplyDialog.vue";
 
 const toast = useToast();
 const authStore = useAuthStore();
 const jobStore = useJobStore();
+
+const showDialog = ref(false);
+const selectedJob = ref(null);
 
 const applyToJob = async (jobId) => {
   try {
@@ -55,6 +60,22 @@ const applyToJob = async (jobId) => {
       detail: "You already applied to this job.",
       life: 3000,
     });
+  }
+};
+
+const openApplyDialog = (job) => {
+  if (jobStore.applicationsIds.includes(job.id)) {
+    toast.add({
+      severity: "error",
+      summary: "Error!",
+      detail: "You already applied to this job.",
+      life: 3000,
+    });
+
+    showDialog.value = false;
+  } else {
+    showDialog.value = true;
+    selectedJob.value = job;
   }
 };
 

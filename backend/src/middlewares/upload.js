@@ -14,10 +14,24 @@ const imageFilter = (req, file, cb) => {
   }
 };
 
+const pdfFilter = (req, file, cb) => {
+  if (file.mimetype === "application/pdf") {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid format! Only pdf for CVs."), false);
+  }
+};
+
 const uploadImage = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: imageFilter,
 });
 
-module.exports = { uploadImage };
+const uploadPDF = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: pdfFilter,
+});
+
+module.exports = { uploadImage, uploadPDF };
