@@ -6,7 +6,7 @@
       <div class="flex justify-content-between align-items-start">
         <div class="flex flex-column">
           <Tag
-            v-if="hasApplied()"
+            v-if="!authStore.isRecruiter && hasApplied()"
             value="Applied"
             severity="secondary"
             rounded

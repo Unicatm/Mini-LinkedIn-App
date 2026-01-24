@@ -79,11 +79,23 @@
           <Column header="Actions" alignFrozen="right" frozen>
             <template #body="{ data }">
               <Button
-                label="View Profile"
+                label="Profile"
                 icon="pi pi-external-link"
                 size="small"
                 text
+                rounded
                 @click="viewCandidateProfile(data.candidateId)"
+              />
+              <Button
+                v-if="data.cvUrl"
+                label="CV"
+                icon="pi pi-file-pdf"
+                v-tooltip.top="'Open CV'"
+                size="small"
+                text
+                rounded
+                severity="danger"
+                @click="openCv(data.cvUrl)"
               />
             </template>
           </Column>
@@ -114,6 +126,12 @@ const viewCandidateProfile = (candidateId) => {
     name: "PublicCandiateProfile",
     params: { id: candidateId },
   });
+};
+
+const openCv = (url) => {
+  if (url) {
+    window.open(url, "_blank");
+  }
 };
 
 const getStatusSeverity = (status) => {
