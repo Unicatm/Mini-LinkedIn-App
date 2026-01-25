@@ -1,8 +1,9 @@
 import api from "./index";
 
 export const jobsApi = {
-  async fetchJobs() {
-    const response = await api.get("/jobs");
+  async fetchJobs(query = "") {
+    const response = await api.get(`/jobs${query}`);
+    // console.log(response);
     return response.data;
   },
 
@@ -34,7 +35,7 @@ export const jobsApi = {
 
   async fetchMyApplications() {
     const response = await api.get("/applications");
-    console.log(response);
+    // console.log(response);
     return response.data;
   },
 

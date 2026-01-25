@@ -16,7 +16,7 @@ import NavBar from "./components/NavBar.vue";
 
 const route = useRoute();
 const showNavBar = computed(() => {
-  return route.name != "Login" || route.name == "Register";
+  return route.name != "Login" && route.name !== "RegisterPage";
 });
 </script>
 

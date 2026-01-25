@@ -8,15 +8,24 @@ export const useJobStore = defineStore("job", () => {
   const applicationsIds = ref([]);
   const error = ref(null);
 
+  const totalJobs = ref(0);
+  const isLoading = ref(false);
+
   const activeJobs = computed(() =>
     jobs.value.filter((job) => job.status === "active"),
   );
 
-  async function fetchJobs() {
-    error.value = null;
+  async function fetchJobs(filters = [], page = 0, limit = 10) {
+    isLoading.value = true;
     try {
-      const data = await jobsApi.fetchJobs();
-      jobs.value = data.reverse();
+      let query = `?limit=${limit}&page=${page}`;
+      if (filters.length > 0) {
+        const queryParams = filters.join(",");
+        query += `&types=${queryParams}`;
+      }
+      const data = await jobsApi.fetchJobs(query);
+      jobs.value = data.jobs;
+      totalJobs.value = data.total;
       // console.log(data);
     } catch (err) {
       error.value = "Error retrieving jobs.";
@@ -124,6 +133,8 @@ export const useJobStore = defineStore("job", () => {
   return {
     jobs,
     applications,
+    totalJobs,
+    isLoading,
     applicationsIds,
     error,
     activeJobs,

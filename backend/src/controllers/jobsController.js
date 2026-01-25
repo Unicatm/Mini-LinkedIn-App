@@ -1,4 +1,4 @@
-const {db} = require("../utils/dbService");
+const { db } = require("../utils/dbService");
 
 exports.createJob = async (req, res) => {
   try {
@@ -96,6 +96,7 @@ exports.getMyJobs = async (req, res) => {
   try {
     const snapshot = await db
       .collection("jobs")
+      .orderBy("createdAt", "desc")
       .where("recruiterId", "==", req.user.uid)
       .get();
 
@@ -108,13 +109,27 @@ exports.getMyJobs = async (req, res) => {
 
 exports.getAllJobs = async (req, res) => {
   try {
-    const snapshot = await db
-      .collection("jobs")
-      .where("status", "==", "active")
+    const { types, limit = 10, page = 0 } = req.query;
+
+    let jobsRef = db.collection("jobs");
+
+    if (types && types.length > 0) {
+      const arrTypes = types.split(",");
+      jobsRef = jobsRef.where("type", "in", arrTypes);
+    }
+
+    const countSnapshot = await jobsRef.count().get();
+    const totalJobs = countSnapshot.data().count;
+    const offset = parseInt(page) * parseInt(limit);
+
+    const snapshot = await jobsRef
+      .orderBy("createdAt", "desc")
+      .limit(parseInt(limit))
+      .offset(offset)
       .get();
 
     const jobs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    res.status(200).json(jobs);
+    res.status(200).json({ jobs, total: totalJobs });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
