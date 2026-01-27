@@ -31,10 +31,11 @@
 </template>
 
 <script setup>
-import { Button, Menu } from "primevue";
+import { Button } from "primevue";
+import { Menu } from "primevue";
 import { ref } from "vue";
 
-const menu = ref();
+const menu = ref(null);
 const items = ref([
   {
     items: [

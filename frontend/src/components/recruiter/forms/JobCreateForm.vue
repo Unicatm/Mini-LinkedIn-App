@@ -22,72 +22,90 @@
         :class="{ 'opacity-50 pointer-events-none': !isProfileComplete }"
       >
         <span class="text-500 font-medium ml-1">Publish a new Job</span>
-
-        <div>
-          <InputText
-            v-model="title"
-            placeholder="Job Title (ex: Senior Java Dev)"
-            class="w-full"
-          />
-          <small v-if="!title && subbmited" class="text-red-600">
-            Title is required.
-          </small>
-        </div>
-
-        <div>
-          <Textarea
-            v-model="description"
-            rows="2"
-            placeholder="Description..."
-            class="w-full"
-            autoResize
-          />
-          <small v-if="!description && subbmited" class="text-red-600">
-            Description is required.
-          </small>
-        </div>
-
-        <div class="flex gap-2">
-          <div class="w-full">
+        <Form
+          v-slot="$form"
+          :resolver="resolver"
+          :initialValues="initialValues"
+          @submit="onFormSubmit"
+          class="flex flex-column gap-3"
+        >
+          <div>
             <InputText
-              v-model="salary"
-              placeholder="Salary (ex: 2000)"
+              name="title"
+              placeholder="Job Title (ex: Senior Java Dev)"
               class="w-full"
             />
-            <small v-if="!salary && subbmited" class="text-red-600">
-              Salary is required.
-            </small>
+            <Message
+              v-if="$form.title?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+            >
+              {{ $form.title.error.message }}
+            </Message>
           </div>
 
-          <Select
-            v-model="type"
-            :options="['Remote', 'On-site', 'Hybrid']"
-            placeholder="Type"
-            class="w-full h-fit"
-          />
-        </div>
+          <div>
+            <Textarea
+              name="description"
+              rows="2"
+              placeholder="Description..."
+              class="w-full"
+              autoResize
+            />
+            <Message
+              v-if="$form.description?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+            >
+              {{ $form.description.error.message }}
+            </Message>
+          </div>
 
-        <div class="flex justify-content-end mt-2">
-          <Button
-            label="Publish Job"
-            icon="pi pi-send"
-            @click="handlePostJob"
-            :disabled="!isProfileComplete"
-            variant="outlined"
-            class="border-blue-600 text-blue-600 hover:bg-blue-50"
-          />
-        </div>
+          <div class="flex gap-2">
+            <div class="w-full">
+              <InputText
+                name="salary"
+                placeholder="Salary (EUR)"
+                class="w-full"
+                v-keyfilter.num
+              />
+            </div>
+
+            <Select
+              name="type"
+              :options="['Remote', 'On-site', 'Hybrid']"
+              placeholder="Type"
+              class="w-full h-fit"
+            />
+          </div>
+
+          <div class="flex justify-content-end mt-2">
+            <Button
+              type="submit"
+              label="Publish Job"
+              icon="pi pi-send"
+              :disabled="!isProfileComplete"
+              variant="outlined"
+              class="border-blue-600 text-blue-600 hover:bg-blue-50"
+            />
+          </div>
+        </Form>
       </div>
     </template>
   </Card>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useUsersStore } from "@/stores/userStore";
 import { useJobStore } from "@/stores/jobsStore";
 
-import { Card, Button, Select, Textarea, InputText } from "primevue";
+import { Card, Button, Select, Textarea, InputText, Message } from "primevue";
+import { Form } from "@primevue/forms";
+import { zodResolver } from "@primevue/forms/resolvers/zod";
+import { z } from "zod";
 
 const props = defineProps({
   readOnly: {
@@ -99,38 +117,39 @@ const props = defineProps({
 const jobStore = useJobStore();
 const usersStore = useUsersStore();
 
-const title = ref("");
-const description = ref("");
-const salary = ref("");
-const type = ref("Remote");
-const subbmited = ref(false);
-
 const isProfileComplete = computed(() => {
-  const profile = usersStore.myProfile?.profile;
+  const profile = usersStore?.myProfile?.profile;
 
   return (
     profile &&
-    profile.companyName.trim() !== "" &&
-    profile.location.trim() !== "" &&
-    profile.bio.trim() !== ""
+    profile?.companyName?.trim() !== "" &&
+    profile?.location?.trim() !== "" &&
+    profile?.bio?.trim() !== ""
   );
 });
 
-const handlePostJob = async () => {
-  subbmited.value = true;
-  if (!isProfileComplete.value) return;
-  if (!title.value || !description.value || !salary.value) return;
+const initialValues = {
+  title: "",
+  description: "",
+  salary: "",
+  type: "Remote",
+};
 
-  await jobStore.createJob({
-    title: title.value,
-    description: description.value,
-    salary: salary.value,
-    type: type.value,
-  });
-  subbmited.value = false;
+const resolver = zodResolver(
+  z.object({
+    title: z.string().min(1, "Title is required."),
+    description: z.string().min(10, "Description needs to be longer."),
+    salary: z.string(),
+    type: z.string(),
+  }),
+);
 
-  title.value = "";
-  description.value = "";
-  salary.value = "";
+const onFormSubmit = async ({ valid, values, reset }) => {
+  if (valid) {
+    if (!isProfileComplete.value) return;
+
+    await jobStore.createJob(values);
+    reset();
+  }
 };
 </script>

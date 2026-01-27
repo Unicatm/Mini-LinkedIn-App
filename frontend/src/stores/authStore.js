@@ -2,6 +2,7 @@ import router from "@/router";
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { authApi } from "../api/authApi";
+import { useUsersStore } from "./userStore";
 
 export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("jwtToken") || null);
@@ -54,6 +55,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function logout() {
     saveState(null, null);
+    const userStore = useUsersStore();
+    userStore.clearUserData();
     router.push("/login");
   }
 

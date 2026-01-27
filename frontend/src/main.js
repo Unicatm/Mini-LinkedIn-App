@@ -6,6 +6,7 @@ import { createPinia } from "pinia";
 import PrimeVue from "primevue/config";
 import Lara from "@primeuix/themes/lara";
 import ToastService from "primevue/toastservice";
+import KeyFilter from "primevue/keyfilter";
 
 import App from "./App.vue";
 import router from "./router";
@@ -24,5 +25,6 @@ app.use(PrimeVue, {
 app.use(createPinia());
 app.use(router);
 app.use(ToastService);
+app.directive("keyfilter", KeyFilter);
 
 app.mount("#app");

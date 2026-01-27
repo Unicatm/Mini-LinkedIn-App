@@ -43,17 +43,6 @@ export const useUsersStore = defineStore("user", () => {
     }
   }
 
-  async function uploadCover(file) {
-    try {
-      const response = await usersApi.uploadFile(file, "cover");
-      fetchMyProfile();
-      return response.url;
-    } catch (err) {
-      error.value = "Could not update profile.";
-      throw err;
-    }
-  }
-
   async function uploadAvatar(file, type) {
     try {
       const response = await usersApi.uploadFile(file, type);

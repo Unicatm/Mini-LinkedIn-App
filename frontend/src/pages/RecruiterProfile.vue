@@ -33,7 +33,6 @@ import RecruiterBio from "@/components/recruiter/RecruiterBio.vue";
 import JobCreateForm from "@/components/recruiter/forms/JobCreateForm.vue";
 import RecruitersJobList from "@/components/recruiter/RecruitersJobList.vue";
 
-import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 
 const route = useRoute();

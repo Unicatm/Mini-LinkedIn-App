@@ -67,15 +67,6 @@
             </template>
           </Column>
 
-          <Column header="Status">
-            <template #body="{ data }">
-              <Tag
-                :value="data.status"
-                :severity="getStatusSeverity(data.status)"
-              />
-            </template>
-          </Column>
-
           <Column header="Actions" alignFrozen="right" frozen>
             <template #body="{ data }">
               <Button
@@ -131,19 +122,6 @@ const viewCandidateProfile = (candidateId) => {
 const openCv = (url) => {
   if (url) {
     window.open(url, "_blank");
-  }
-};
-
-const getStatusSeverity = (status) => {
-  switch (status) {
-    case "pending":
-      return "warning";
-    case "accepted":
-      return "success";
-    case "rejected":
-      return "danger";
-    default:
-      return "info";
   }
 };
 

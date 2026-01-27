@@ -47,7 +47,7 @@
         <Tag
           icon="pi pi-wallet"
           severity="info"
-          :value="job.salary || 'Confidential'"
+          :value="job.salary ? `${job.salary} EUR` : 'Confidential'"
           rounded
           class="bg-blue-600"
         />
